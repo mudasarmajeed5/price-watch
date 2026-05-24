@@ -33,12 +33,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "/login",
     newUser: "/onboarding", // New users will be directed here on first sign in
   },
-  callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log("User successfully authenticated:", user.email);
-      return true;
-    },
-  },
   providers: [
     Google,
     Nodemailer({
