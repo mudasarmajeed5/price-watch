@@ -94,6 +94,7 @@ export default function OnboardingPage() {
                 src={slide.image}
                 alt={slide.title}
                 fill
+                sizes="(max-width: 768px) 100vw, 384px"
                 className="object-cover"
                 style={{
                   boxShadow: "inset 0 0 25px rgba(0, 0, 0, 0.2)",

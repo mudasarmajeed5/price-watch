@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { signIn } from "@/auth";
+import { EmailSignUpForm } from "@/components/email-signup-form";
 
 export default function SignupPage() {
   return (
@@ -46,94 +48,7 @@ export default function SignupPage() {
             <CardTitle className="text-base"> </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#1f3f34]">
-                Full Name
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7a9a8c]" />
-                <input
-                  type="text"
-                  placeholder="John Doe"
-                  className="h-11 w-full rounded-lg border border-[#cfe0d8] bg-[#f7faf9] pl-10 pr-3 text-sm text-[#0f3d2e] outline-none transition focus:border-[#0f6b4a] focus:ring-2 focus:ring-[#0f6b4a]/20"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#1f3f34]">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7a9a8c]" />
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  className="h-11 w-full rounded-lg border border-[#cfe0d8] bg-[#f7faf9] pl-10 pr-3 text-sm text-[#0f3d2e] outline-none transition focus:border-[#0f6b4a] focus:ring-2 focus:ring-[#0f6b4a]/20"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#1f3f34]">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7a9a8c]" />
-                <input
-                  type="password"
-                  placeholder="********"
-                  className="h-11 w-full rounded-lg border border-[#cfe0d8] bg-[#f7faf9] pl-10 pr-10 text-sm text-[#0f3d2e] outline-none transition focus:border-[#0f6b4a] focus:ring-2 focus:ring-[#0f6b4a]/20"
-                />
-                <Eye className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7a9a8c]" />
-              </div>
-              <p className="text-[11px] text-[#7a9a8c]">
-                Must be at least 8 characters long.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-[#1f3f34]">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7a9a8c]" />
-                <input
-                  type="password"
-                  placeholder="********"
-                  className="h-11 w-full rounded-lg border border-[#cfe0d8] bg-[#f7faf9] pl-10 pr-10 text-sm text-[#0f3d2e] outline-none transition focus:border-[#0f6b4a] focus:ring-2 focus:ring-[#0f6b4a]/20"
-                />
-                <Eye className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7a9a8c]" />
-              </div>
-              <p className="text-[11px] text-[#7a9a8c]">
-                Must be at least 8 characters long.
-              </p>
-            </div>
-
-            <label className="flex items-start gap-2 text-xs text-[#5f7f73]">
-              <input
-                type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-[#cfe0d8] text-[#0f6b4a]"
-              />
-              <span>
-                I agree to the{" "}
-                <button className="font-semibold text-[#0f6b4a] hover:text-[#0c5b3f]">
-                  Terms of Service
-                </button>{" "}
-                and{" "}
-                <button className="font-semibold text-[#0f6b4a] hover:text-[#0c5b3f]">
-                  Privacy Policy
-                </button>
-                .
-              </span>
-            </label>
-
-            <Button className="h-11 w-full bg-[#0f6b4a] text-white hover:bg-[#0c5b3f]">
-              Sign Up
-              <span>
-                <ArrowRight className="w-4 h-4"/>
-              </span>
-            </Button>
+            <EmailSignUpForm />
           </CardContent>
           <CardFooter className="flex flex-col gap-4 pt-0">
             <div className="flex w-full items-center gap-3 text-[11px] text-[#7a9a8c]">
@@ -143,13 +58,22 @@ export default function SignupPage() {
             </div>
 
             <div className="flex w-full gap-3">
-              <Button
-                variant="outline"
-                className="h-11 flex-1 gap-2 border-[#d7e4de] bg-white text-[#0f3d2e] hover:bg-[#eef5f2]"
+              <form
+                className="flex-1"
+                action={async () => {
+                  "use server";
+                  await signIn("google");
+                }}
               >
-                <FaGoogle className="h-4 w-4" />
-                Google
-              </Button>
+                <Button
+                  variant="outline"
+                  type="submit"
+                  className="h-11 w-full gap-2 border-[#d7e4de] bg-white text-[#0f3d2e] hover:bg-[#eef5f2]"
+                >
+                  <FaGoogle className="h-4 w-4" />
+                  Google
+                </Button>
+              </form>
               <Button
                 variant="outline"
                 className="h-11 flex-1 gap-2 border-[#d7e4de] bg-white text-[#0f3d2e] hover:bg-[#eef5f2]"
