@@ -6,6 +6,7 @@ import {
   Trash2,
   ChevronRight,
   Settings,
+  Loader2,
 } from "lucide-react";
 import {
   Popover,
@@ -85,7 +86,7 @@ export default async function ProfilePage() {
                 Choose what updates you want to receive.
               </p>
             </div>
-            <div className="p-4 flex flex-col gap-5">
+            <div className="p-4 pb-1 flex flex-col gap-5">
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
                   <Label className="text-sm font-medium">
@@ -108,18 +109,13 @@ export default async function ProfilePage() {
                 </div>
                 <Switch defaultChecked />
               </div>
-              <div className="flex items-center justify-between gap-4">
-                <div className="space-y-0.5">
-                  <Label className="text-sm font-medium">
-                    New Feature Updates
-                  </Label>
-                  <p className="text-[11px] text-muted-foreground">
-                    Stay in the loop with platform improvements.
-                  </p>
-                </div>
-                <Switch />
-              </div>
             </div>
+            <button
+              type="submit"
+              className="mb-3 h-10 w-4/5 mx-auto rounded-xl bg-emerald-700 text-white text-sm font-medium hover:bg-emerald-800 active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
+            >
+              Save Changes
+            </button>
           </PopoverContent>
         </Popover>
 

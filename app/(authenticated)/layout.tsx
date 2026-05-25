@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Eye, Search, BarChart2, User } from "lucide-react";
+import { Home, Eye, Search, BarChart2, User, PlusIcon, UserCircle } from "lucide-react";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Watchlist", icon: Eye, href: "/watchlist" },
+  { label: "", icon: PlusIcon, href: "/add-product" },
   { label: "Search", icon: Search, href: "/search" },
-  { label: "Analytics", icon: BarChart2, href: "/analytics" },
-  { label: "Profile", icon: User, href: "/profile" },
+  { label: "Profile", icon: UserCircle, href: "/profile" },
 ];
 
 export default function AuthenticatedLayout({
@@ -30,15 +30,25 @@ export default function AuthenticatedLayout({
           // A simple active checker based on pathname
           const isActive =
             pathname === href || (href !== "/" && pathname?.startsWith(href));
+          const isFab = label === "";
+          if (isFab) {
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-label={label || "Add"}
+                className={`relative -mt-4 flex items-center justify-center w-12 h-12 rounded-full transition-shadow focus:outline-none focus:ring-2 focus:ring-emerald-300 ${isActive ? "bg-emerald-800 text-white shadow-xl" : "bg-emerald-700 text-white shadow-lg"}`}
+              >
+                <Icon size={24} strokeWidth={1.8} />
+              </Link>
+            );
+          }
           return (
             <Link
-              key={label}
+              key={href}
               href={href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
-                isActive
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "text-muted-foreground"
-              }`}
+              aria-label={label}
+              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${isActive ? "bg-emerald-50 text-emerald-700" : "text-muted-foreground"}`}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
               <span
