@@ -182,7 +182,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between px-3 mb-4">
             <h2 className="text-sm font-semibold">Biggest Price Drops</h2>
             <Link
-              href="/deals"
+              href="/view-all"
               className="text-xs text-emerald-700 font-medium"
             >
               View All
