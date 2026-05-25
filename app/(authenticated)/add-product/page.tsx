@@ -3,15 +3,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MissingInfoModal } from "@/components/ui/missing-info-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
-  Clipboard,
-  Search,
-  Bell,
-  Loader2,
-  X,
-  ShoppingBag,
-  ChevronDown,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Clipboard, Search, Bell, Loader2, X, ShoppingBag } from "lucide-react";
 import Image from "next/image";
 
 type Product = {
@@ -64,7 +64,8 @@ export default function Page() {
     if (!store || !trimmed) {
       setModal({
         title: "Missing Information",
-        description: "Please select a store and add a product link before continuing.",
+        description:
+          "Please select a store and add a product link before continuing.",
       });
       return;
     }
@@ -120,7 +121,8 @@ export default function Page() {
             Add Product
           </h1>
           <p className="text-xs text-muted-foreground text-center mb-6">
-            Paste a product link below to start tracking its price automatically.
+            Paste a product link below to start tracking its price
+            automatically.
           </p>
 
           <Card className="mb-4 rounded-2xl shadow-sm">
@@ -130,34 +132,32 @@ export default function Page() {
                   <label className="block text-xs font-medium text-muted-foreground">
                     Select Store
                   </label>
-                  <div className="relative">
-                    <select
-                      value={store}
-                      onChange={(e) => {
-                        setStore(e.target.value);
-                        setError("");
-                        setPreview(null);
-                      }}
-                      className="h-11 w-full appearance-none rounded-lg border border-input bg-input/30 px-3 pr-9 text-sm text-foreground"
-                    >
-                      <option value="" disabled>
-                        Select
-                      </option>
+                  <Select
+                    value={store}
+                    onValueChange={(value) => {
+                      setStore(value);
+                      setError("");
+                      setPreview(null);
+                    }}
+                  >
+                    <SelectTrigger className="h-11 w-full rounded-lg bg-input/30 px-3 text-sm">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent className="w-[var(--radix-select-trigger-width)]">
                       {storeOptions.map((option) => (
-                        <option key={option} value={option}>
+                        <SelectItem key={option} value={option}>
                           {option}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-muted-foreground">
                     Product Link
                   </label>
                   <div className="relative">
-                    <input
+                    <Input
                       placeholder="https://outfitters.com.pk/products/..."
                       value={link}
                       onChange={(e) => {
@@ -165,7 +165,7 @@ export default function Page() {
                         setError("");
                         setPreview(null);
                       }}
-                      className="h-11 w-full rounded-lg border border-input bg-input/30 px-3 pr-11 text-sm"
+                      className="h-11 rounded-lg bg-input/30 px-3 pr-11 text-sm"
                     />
                     <button
                       type="button"
@@ -205,7 +205,7 @@ export default function Page() {
             <CardContent className="pt-5 pb-4">
               {preview ? (
                 <div className="flex flex-col gap-3">
-                  <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-muted">
+                  <div className="relative w-full aspect-3/4 rounded-xl overflow-hidden bg-muted">
                     <Image
                       src={preview.image}
                       alt={preview.title}
