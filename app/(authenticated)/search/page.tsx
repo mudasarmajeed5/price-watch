@@ -1,4 +1,8 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   Bell,
   Search,
@@ -9,43 +13,22 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getCollection } from "@/lib/products";
+import { useFavorites } from "@/lib/use-favorites";
 
-const filters = ["BreakOut", "Outfitters", "Ethnic", "Batik"];
+const storeOptions = ["Outfitters", "BreakOut", "Saya", "Sana Safinaz"];
 
-const results = [
-  {
-    id: 1,
-    name: "Button Down Shirt",
-    brand: "BreakOut",
-    price: 2799,
-    originalPrice: 3999,
-    drop: 7,
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
-  },
-  {
-    id: 2,
-    name: "Button Down Shirt",
-    brand: "BreakOut",
-    price: 2799,
-    originalPrice: 3999,
-    drop: 7,
-    image:
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=500&q=80",
-  },
-  {
-    id: 3,
-    name: "Button Down Shirt",
-    brand: "BreakOut",
-    price: 2799,
-    originalPrice: 3999,
-    drop: 7,
-    image:
-      "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=500&q=80",
-  },
-];
+const results = getCollection("searchResults");
 
 export default function SearchPage() {
+  const [activeStore, setActiveStore] = useState(storeOptions[0]);
+  const { isFavorite, toggleFavorite } = useFavorites();
+
+  const filteredResults = useMemo(
+    () => results.filter((item) => item.brand === activeStore),
+    [activeStore, results],
+  );
+
   return (
     <>
       <header className="bg-background border-b px-3 pt-4 pb-3 sticky top-0 z-10">
@@ -91,12 +74,13 @@ export default function SearchPage() {
               <SlidersHorizontal size={14} />
             </button>
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-              {filters.map((label) => {
-                const isActive = label === "BreakOut";
+              {storeOptions.map((label) => {
+                const isActive = label === activeStore;
                 return (
                   <button
                     key={label}
                     type="button"
+                    onClick={() => setActiveStore(label)}
                     className={`px-3 h-8 rounded-full text-[11px] border transition-colors shrink-0 ${
                       isActive
                         ? "bg-emerald-700 text-white border-emerald-700"
@@ -111,59 +95,95 @@ export default function SearchPage() {
           </div>
           <p className="text-[11px] text-muted-foreground mb-3">
             Showing Products of{" "}
-            <span className="text-foreground">"BreakOut"</span>
+            <span className="text-foreground">"{activeStore}"</span>
           </p>
         </section>
 
         <section className="px-3 pb-6">
-          <div className="flex flex-col gap-3">
-            {results.map((item) => (
-              <Card key={item.id} className="rounded-2xl border shadow-none">
-                <CardContent className="p-2.5 flex gap-3 items-stretch">
-                  <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold leading-snug line-clamp-2">
-                      {item.name}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {item.brand}
-                    </p>
-                    <div className="mt-2 flex items-baseline gap-2">
-                      <span className="text-sm font-bold text-emerald-700">
-                        PKR {item.price.toLocaleString("en-PK")}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground line-through">
-                        PKR {item.originalPrice.toLocaleString("en-PK")}
-                      </span>
-                    </div>
-                    <Badge className="mt-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0.5 gap-1 inline-flex items-center">
-                      <TrendingDown size={10} /> {item.drop}% Price Drop
-                    </Badge>
-                  </div>
-                  <div className="flex flex-col items-end justify-between">
-                    <button
-                      type="button"
-                      aria-label="Add to favorites"
-                      className="h-7 w-7 rounded-full border bg-background flex items-center justify-center text-muted-foreground"
-                    >
-                      <Heart size={14} />
-                    </button>
-                    <Button className="h-7 px-3 text-[10px] rounded-lg bg-emerald-700 hover:bg-emerald-800">
-                      View
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {filteredResults.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-10 text-center">
+              <p className="text-sm font-medium">No products found</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Try another brand filter.
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {filteredResults.map((item) => {
+                const favorite = isFavorite(item.id);
+                return (
+                  <Card
+                    key={item.id}
+                    className="rounded-2xl border shadow-none"
+                  >
+                    <CardContent className="p-2.5 flex gap-3 items-stretch">
+                      <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
+                        <Image
+                          src={item.image}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
+                          sizes="80px"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold leading-snug line-clamp-2">
+                          {item.name}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {item.brand}
+                        </p>
+                        <div className="mt-2 flex items-baseline gap-2">
+                          <span className="text-sm font-bold text-emerald-700">
+                            PKR {item.price.toLocaleString("en-PK")}
+                          </span>
+                          {item.originalPrice ? (
+                            <span className="text-[10px] text-muted-foreground line-through">
+                              PKR {item.originalPrice.toLocaleString("en-PK")}
+                            </span>
+                          ) : null}
+                        </div>
+                        {item.dropPercent ? (
+                          <Badge className="mt-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0.5 gap-1 inline-flex items-center">
+                            <TrendingDown size={10} /> {item.dropPercent}% Price
+                            Drop
+                          </Badge>
+                        ) : null}
+                      </div>
+                      <div className="flex flex-col items-end justify-between">
+                        <button
+                          type="button"
+                          aria-label={
+                            favorite
+                              ? "Remove from favorites"
+                              : "Add to favorites"
+                          }
+                          aria-pressed={favorite}
+                          onClick={() => toggleFavorite(item.id)}
+                          className={`h-7 w-7 rounded-full border flex items-center justify-center transition-colors ${
+                            favorite
+                              ? "border-red-200 bg-red-50 text-red-500"
+                              : "bg-background text-muted-foreground"
+                          }`}
+                        >
+                          <Heart
+                            size={14}
+                            fill={favorite ? "currentColor" : "none"}
+                          />
+                        </button>
+                        <Button
+                          asChild
+                          className="h-7 px-3 text-[10px] rounded-lg bg-emerald-700 hover:bg-emerald-800"
+                        >
+                          <Link href={`/product/${item.id}`}>View</Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </section>
       </main>
     </>

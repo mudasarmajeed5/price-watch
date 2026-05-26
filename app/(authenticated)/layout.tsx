@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Eye, Search, BarChart2, User, PlusIcon, UserCircle } from "lucide-react";
+import { Home, Eye, Search, PlusIcon, UserCircle } from "lucide-react";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },

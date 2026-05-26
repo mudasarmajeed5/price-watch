@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Clipboard, Search, Bell, Loader2, X, ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 type Product = {
   id: string;
@@ -20,6 +21,7 @@ type Product = {
   image: string;
   url: string;
   price?: string;
+  targetPrice?: string;
 };
 
 type Preview = {
@@ -58,6 +60,7 @@ export default function Page() {
   const [error, setError] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [modal, setModal] = useState<ModalState>(null);
+  const [targetPrice, setTargetPrice] = useState("");
 
   const handleFetch = async () => {
     const trimmed = link.trim();
@@ -92,6 +95,13 @@ export default function Page() {
 
   const handleAddToTracking = () => {
     if (!preview) return;
+    if (!targetPrice.trim()) {
+      setModal({
+        title: "Missing Target Price",
+        description: "Please set a target price before tracking this item.",
+      });
+      return;
+    }
     setProducts((prev) => [
       {
         id: Date.now().toString(),
@@ -99,11 +109,13 @@ export default function Page() {
         image: preview.image,
         url: link.trim(),
         price: preview.price,
+        targetPrice: targetPrice.trim(),
       },
       ...prev,
     ]);
     setPreview(null);
     setLink("");
+    setTargetPrice("");
   };
 
   return (
@@ -143,7 +155,7 @@ export default function Page() {
                     <SelectTrigger className="h-11 w-full rounded-lg bg-input/30 px-3 text-sm">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent className="w-[var(--radix-select-trigger-width)]">
+                    <SelectContent className="w-(--radix-select-trigger-width)">
                       {storeOptions.map((option) => (
                         <SelectItem key={option} value={option}>
                           {option}
@@ -184,6 +196,20 @@ export default function Page() {
                     </button>
                   </div>
                   {error && <p className="text-xs text-red-500">{error}</p>}
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium text-muted-foreground">
+                    Target Price
+                  </label>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    min="0"
+                    placeholder="Enter target price (PKR)"
+                    value={targetPrice}
+                    onChange={(e) => setTargetPrice(e.target.value)}
+                    className="h-11 rounded-lg bg-input/30 px-3 text-sm"
+                  />
                 </div>
                 <Button
                   className="w-full h-10 border border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
@@ -260,25 +286,35 @@ export default function Page() {
                   <Card key={p.id}>
                     <CardContent className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="relative size-16 shrink-0 rounded-lg overflow-hidden bg-muted">
-                          <Image
-                            src={p.image}
-                            alt={p.title}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium leading-snug line-clamp-2">
-                            {p.title}
-                          </p>
-                          {p.price && (
-                            <p className="text-xs font-semibold text-emerald-700 mt-0.5">
-                              PKR {p.price}
+                        <Link
+                          href={`/product/${p.id}`}
+                          className="flex items-center gap-3 flex-1 min-w-0"
+                        >
+                          <div className="relative size-16 shrink-0 rounded-lg overflow-hidden bg-muted">
+                            <Image
+                              src={p.image}
+                              alt={p.title}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium leading-snug line-clamp-2">
+                              {p.title}
                             </p>
-                          )}
-                        </div>
+                            {p.price && (
+                              <p className="text-xs font-semibold text-emerald-700 mt-0.5">
+                                PKR {p.price}
+                              </p>
+                            )}
+                            {p.targetPrice && (
+                              <p className="text-[11px] text-muted-foreground mt-1">
+                                Target: PKR {p.targetPrice}
+                              </p>
+                            )}
+                          </div>
+                        </Link>
                         <button
                           onClick={() =>
                             setProducts((prev) =>

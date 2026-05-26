@@ -1,0 +1,237 @@
+const productsData = {
+  products: [
+    {
+      id: "p1",
+      name: "Pleated Wide-Leg Trousers",
+      brand: "Outfitters",
+      category: "Men's Trousers",
+      price: 7990,
+      image:
+        "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=1000&q=80",
+    },
+    {
+      id: "p2",
+      name: "iPhone 15 Pro 256GB",
+      brand: "Apple",
+      category: "Phones",
+      price: 385000,
+      dropAmount: 5000,
+      image:
+        "https://images.unsplash.com/photo-1696446701796-da61225697cc?w=500&q=80",
+    },
+    {
+      id: "p3",
+      name: "Dell XPS 13 Plus",
+      brand: "Dell",
+      category: "Laptops",
+      price: 420000,
+      dropAmount: 0,
+      image:
+        "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=500&q=80",
+    },
+    {
+      id: "p4",
+      name: "Samsung Galaxy Tab S9",
+      brand: "Samsung",
+      category: "Tablets",
+      price: 198000,
+      dropAmount: 8000,
+      image:
+        "https://images.unsplash.com/photo-1544244015-0df4b3bd43cb?w=500&q=80",
+    },
+    {
+      id: "p5",
+      name: "Sony WH-1000XM5",
+      brand: "Sony",
+      category: "Audio",
+      price: 89000,
+      dropAmount: 0,
+      image:
+        "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80",
+    },
+    {
+      id: "p6",
+      name: "Sony PlayStation 5 Disc Edition",
+      brand: "Sony",
+      category: "Gaming",
+      store: "Daraz",
+      price: 165000,
+      originalPrice: 188000,
+      discount: 12,
+      addedAt: "2026-05-24",
+      image:
+        "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=500&q=80",
+    },
+    {
+      id: "p7",
+      name: "AirPods Pro (2nd Gen)",
+      brand: "Apple",
+      category: "Audio",
+      store: "PriceOye",
+      price: 62500,
+      originalPrice: 68000,
+      discount: 8,
+      addedAt: "2026-05-23",
+      image:
+        "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500&q=80",
+    },
+    {
+      id: "p8",
+      name: "Relaxed Fit Knitted Polo",
+      brand: "Brunches",
+      category: "Men's Tops",
+      price: 3849,
+      originalPrice: 5499,
+      discount: 30,
+      image:
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
+    },
+    {
+      id: "p9",
+      name: "Uni Directional Knitted Polo",
+      brand: "Brunches",
+      category: "Men's Tops",
+      price: 4899,
+      originalPrice: 6999,
+      discount: 30,
+      image:
+        "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=500&q=80",
+    },
+    {
+      id: "p10",
+      name: "Cotton Dress Shirt",
+      brand: "Oxford Co.",
+      category: "Formal Wear",
+      price: 5447,
+      originalPrice: 9900,
+      discount: 45,
+      image:
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&q=80",
+    },
+    {
+      id: "p11",
+      name: "Button Down Shirt",
+      brand: "Outfitters",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3999,
+      dropPercent: 7,
+      image:
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
+    },
+    {
+      id: "p12",
+      name: "Button Down Shirt",
+      brand: "BreakOut",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3999,
+      dropPercent: 7,
+      image:
+        "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=500&q=80",
+    },
+    {
+      id: "p13",
+      name: "Button Down Shirt",
+      brand: "Saya",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3999,
+      dropPercent: 7,
+      image:
+        "https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?w=500&q=80",
+    },
+    {
+      id: "p14",
+      name: "Button Down Shirt",
+      brand: "Brunches Dream 2023",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3500,
+      discount: 20,
+      status: "in stock now",
+      image:
+        "https://images.unsplash.com/photo-1596521450454-74efb340c0da?w=500&q=80",
+    },
+    {
+      id: "p15",
+      name: "Casual Shirt",
+      brand: "Brunches",
+      category: "Menswear",
+      price: 2500,
+      originalPrice: 3000,
+      discount: 17,
+      status: "in stock now",
+      image:
+        "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=500&q=80",
+    },
+    {
+      id: "p16",
+      name: "Button Down Shirt",
+      brand: "Brunches Dream Shirt",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3500,
+      discount: 20,
+      status: "out of stock",
+      image:
+        "https://images.unsplash.com/photo-1596521450454-74efb340c0da?w=500&q=80",
+    },
+    {
+      id: "p17",
+      name: "Striped T-Shirt",
+      brand: "Brunches",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3500,
+      discount: 20,
+      status: "in stock now",
+      image:
+        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
+    },
+    {
+      id: "p18",
+      name: "Button Down Shirt",
+      brand: "Brunches Dream Shirt",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3500,
+      discount: 20,
+      status: "in stock now",
+      image:
+        "https://images.unsplash.com/photo-1596521450454-74efb340c0da?w=500&q=80",
+    },
+    {
+      id: "p19",
+      name: "Casual Shirt",
+      brand: "Brunches",
+      category: "Menswear",
+      price: 2799,
+      originalPrice: 3500,
+      discount: 20,
+      status: "in stock now",
+      image:
+        "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=500&q=80",
+    },
+    {
+      id: "p20",
+      name: "Embroidered Lawn Suit",
+      brand: "Sana Safinaz",
+      category: "Womenswear",
+      price: 12990,
+      originalPrice: 15990,
+      dropPercent: 18,
+      image:
+        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500&q=80",
+    },
+  ],
+  collections: {
+    homeWatchlist: ["p2", "p3", "p4", "p5"],
+    homeRecentlyAdded: ["p6", "p7"],
+    viewAll: ["p8", "p9", "p10", "p10", "p8", "p9"],
+    searchResults: ["p11", "p12", "p13", "p20"],
+    watchlistGrid: ["p14", "p15", "p16", "p17", "p18", "p19"],
+  },
+};
+
+export default productsData;
