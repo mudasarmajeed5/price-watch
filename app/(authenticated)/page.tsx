@@ -61,18 +61,18 @@ export default async function HomePage() {
               {watchlist.map((item) => (
                 <CarouselItem
                   key={String(item._id)}
-                  className="basis-[70%] pl-2"
+                  className="basis-[60%] pl-2"
                 >
                   <Link href={`/product/${String(item._id)}`} className="block">
                     <Card className="rounded-xl border shadow-none">
-                      <CardContent className="p-3">
-                        <div className="relative w-full h-32 rounded-xl bg-emerald-50 overflow-hidden mb-3">
+                      <CardContent className="px-2 py-2">
+                        <div className="relative w-full h-44 rounded-xl bg-emerald-50 overflow-hidden mb-2">
                           <Image
                             src={item.image || "/placeholder.png"}
                             alt={item.title || "Product"}
                             fill
                             loading="eager"
-                            className="object-cover"
+                            className="object-contain object-center scale-110"
                             sizes="(max-width: 768px) 75vw, 300px"
                           />
                         </div>
@@ -132,18 +132,18 @@ export default async function HomePage() {
                 className="block"
               >
                 <Card className="rounded-xl border shadow-none">
-                  <CardContent className="p-2 py-0 flex items-center gap-3 relative">
-                    <div className="relative w-16 h-16 rounded-lg bg-emerald-50/50 shrink-0 overflow-hidden">
+                  <CardContent className="p-2.5 flex gap-3 items-stretch relative">
+                    <div className="relative w-20 h-28 rounded-xl overflow-hidden bg-emerald-50/50 shrink-0">
                       <Image
                         src={deal.image || "/placeholder.png"}
                         alt={deal.title || "Product"}
                         fill
-                        className="object-cover"
-                        sizes="64px"
+                        className="object-contain object-center scale-110"
+                        sizes="80px"
                       />
                     </div>
-                    <div className="flex-1 min-w-0 pr-8">
-                      <p className="text-xs font-semibold leading-snug mb-1 line-clamp-1">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold leading-snug line-clamp-2 mb-1">
                         {deal.title}
                       </p>
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">

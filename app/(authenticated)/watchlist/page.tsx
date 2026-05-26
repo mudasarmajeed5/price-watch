@@ -104,13 +104,13 @@ export default function WatchlistPage() {
                 >
                   <Link href={`/product/${String(item._id)}`} className="block">
                     <div className="p-1 pt-0 pb-1.5 flex-1 flex flex-col relative">
-                      <div className="relative w-full h-24 rounded-t-xl bg-muted overflow-hidden mb-1">
+                      <div className="relative w-full h-32 rounded-t-xl bg-muted overflow-hidden mb-1">
                         <Image
                           src={item.image || "/placeholder.png"}
                           alt={item.title || "Product"}
                           fill
                           loading="eager"
-                          className="object-cover"
+                          className="object-contain object-center"
                           sizes="(max-width: 768px) 45vw, 200px"
                         />
                       </div>

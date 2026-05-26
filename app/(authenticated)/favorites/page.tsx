@@ -10,7 +10,7 @@ import { Product } from "@/lib/products";
 import { useEffect, useState } from "react";
 
 export default function FavoritesPage() {
-  const { favorites } = useFavorites();
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +23,6 @@ export default function FavoritesPage() {
 
       setIsLoading(true);
       try {
-        // Fetch all watchlist items and filter to only those that are favorites
         const baseUrl =
           typeof window !== "undefined"
             ? window.location.origin
@@ -94,7 +93,7 @@ export default function FavoritesPage() {
                           alt={item.title || "Product"}
                           fill
                           loading="eager"
-                          className="object-cover"
+                          className="object-contain object-center"
                           sizes="64px"
                         />
                       </div>
@@ -117,8 +116,37 @@ export default function FavoritesPage() {
                           ) : null}
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite(String(item._id));
+                        }}
+                        aria-label={
+                          isFavorite(String(item._id))
+                            ? "Unfavorite"
+                            : "Add to favorites"
+                        }
+                        aria-pressed={isFavorite(String(item._id))}
+                        className="absolute top-3 right-3 h-8 w-8 rounded-full flex items-center justify-center bg-background border"
+                      >
+                        {isFavorite(String(item._id)) ? (
+                          <Heart
+                            size={14}
+                            fill="currentColor"
+                            className="text-red-500"
+                          />
+                        ) : (
+                          <Heart
+                            size={14}
+                            fill="none"
+                            className="text-muted-foreground"
+                          />
+                        )}
+                      </button>
                       {item.discount ? (
-                        <Badge className="absolute right-3 top-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-2 py-0.5">
+                        <Badge className="absolute right-12 top-3 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-2 py-0.5">
                           {item.discount}% Off
                         </Badge>
                       ) : null}

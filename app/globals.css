@@ -50,8 +50,7 @@
 
 :root {
   --font-sans: var(--font-inter);
-  --background: #f8f9ff;
-  --foreground: oklch(0.145 0 0);
+  --background: hort-foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);

@@ -66,7 +66,9 @@ export default function ProductPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">Loading...</div>
+      <div className="flex min-h-dvh items-center justify-center py-20">
+        <Loader2 className="animate-spin" />
+      </div>
     );
   }
 
@@ -160,7 +162,7 @@ export default function ProductPage() {
       </section>
 
       <section className="px-4 pt-4">
-        <div className="rounded-2xl border bg-background p-4 space-y-4">
+        <div className="rounded-2xl border bg-background p-3 space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[11px] text-muted-foreground">Tracking</p>

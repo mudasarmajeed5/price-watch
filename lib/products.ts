@@ -12,6 +12,7 @@ export type Product = {
   category?: string;
   price?: number;
   latestPrice?: number;
+  targetPrice?: number;
   originalPrice?: number;
   discount?: number;
   dropAmount?: number;

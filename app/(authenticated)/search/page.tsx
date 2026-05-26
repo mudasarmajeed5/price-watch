@@ -163,15 +163,15 @@ export default function SearchPage() {
                     href={`/product/${String(item._id)}`}
                     className="block"
                   >
-                    <Card className="rounded-2xl border shadow-none hover:shadow-md transition-shadow cursor-pointer">
-                      <CardContent className="p-2.5 flex gap-3 items-stretch">
-                        <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
+                    <Card className="rounded-xl border shadow-none hover:shadow-md transition-shadow cursor-pointer">
+                      <CardContent className="px-2 flex gap-3 items-center">
+                        <div className="relative w-20 h-28 rounded-xl shrink-0">
                           <Image
                             src={item.image || "/placeholder.png"}
                             alt={item.title || "Product"}
                             fill
                             loading="eager"
-                            className="object-cover"
+                            className="object-contain rounded-xl scale-110 object-center"
                             sizes="80px"
                           />
                         </div>
@@ -184,8 +184,7 @@ export default function SearchPage() {
                           </p>
                           <div className="mt-2 flex items-baseline gap-2">
                             <span className="text-sm font-bold text-emerald-700">
-                              PKR{" "}
-                              {(item.latestPrice || 0).toLocaleString("en-PK")}
+                              PKR {(item.latestPrice || 0).toLocaleString("en-PK")}
                             </span>
                             {item.originalPrice ? (
                               <span className="text-[10px] text-muted-foreground line-through">
@@ -200,32 +199,24 @@ export default function SearchPage() {
                             </Badge>
                           ) : null}
                         </div>
-                        <div className="flex flex-col items-end justify-between">
-                          <button
-                            type="button"
-                            aria-label={
-                              favorite
-                                ? "Remove from favorites"
-                                : "Add to favorites"
-                            }
-                            aria-pressed={favorite}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              toggleFavorite(String(item._id));
-                            }}
-                            className={`h-7 w-7 rounded-full border flex items-center justify-center transition-colors ${
-                              favorite
-                                ? "border-red-200 bg-red-50 text-red-500"
-                                : "bg-background text-muted-foreground"
-                            }`}
-                          >
-                            <Heart
-                              size={14}
-                              fill={favorite ? "currentColor" : "none"}
-                            />
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleFavorite(String(item._id));
+                          }}
+                          className={`h-7 w-7 rounded-full border flex items-center justify-center transition-colors ${
+                            favorite
+                              ? "border-red-200 bg-red-50 text-red-500"
+                              : "bg-background text-muted-foreground"
+                          }`}
+                        >
+                          <Heart
+                            size={14}
+                            fill={favorite ? "currentColor" : "none"}
+                          />
+                        </button>
                       </CardContent>
                     </Card>
                   </Link>
