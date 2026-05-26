@@ -1,37 +1,84 @@
-// This approach is taken from https://github.com/vercel/next.js/tree/canary/examples/with-mongodb
-import { MongoClient, ServerApiVersion } from "mongodb"
- 
-if (!process.env.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"')
-}
- 
-const uri = process.env.MONGODB_URI
-const options = {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-}
- 
-let client: MongoClient
- 
-if (process.env.NODE_ENV === "development") {
-  // In development mode, use a global variable so that the value
-  // is preserved across module reloads caused by HMR (Hot Module Replacement).
-  let globalWithMongo = global as typeof globalThis & {
-    _mongoClient?: MongoClient
+// Singleton Database Connection Pattern
+import { MongoClient, ServerApiVersion, Db } from "mongodb";
+
+class DatabaseConnection {
+  private static instance: DatabaseConnection;
+  private client: MongoClient | null = null;
+  private db: Db | null = null;
+
+  private constructor() {
+    if (!process.env.MONGODB_URI) {
+      throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+    }
   }
- 
-  if (!globalWithMongo._mongoClient) {
-    globalWithMongo._mongoClient = new MongoClient(uri, options)
+
+  public static getInstance(): DatabaseConnection {
+    if (!DatabaseConnection.instance) {
+      DatabaseConnection.instance = new DatabaseConnection();
+    }
+    return DatabaseConnection.instance;
   }
-  client = globalWithMongo._mongoClient
-} else {
-  // In production mode, it's best to not use a global variable.
-  client = new MongoClient(uri, options)
+
+  public getClient(): MongoClient {
+    if (!this.client) {
+      const uri = process.env.MONGODB_URI!;
+      const options = {
+        serverApi: {
+          version: ServerApiVersion.v1,
+          strict: true,
+          deprecationErrors: true,
+        },
+      };
+
+      // Handle HMR in development
+      if (process.env.NODE_ENV === "development") {
+        const globalWithMongo = global as typeof globalThis & {
+          _mongoClient?: MongoClient;
+        };
+
+        if (!globalWithMongo._mongoClient) {
+          globalWithMongo._mongoClient = new MongoClient(uri, options);
+        }
+        this.client = globalWithMongo._mongoClient;
+      } else {
+        this.client = new MongoClient(uri, options);
+      }
+    }
+    return this.client;
+  }
+
+  public getDb(): Db {
+    if (!this.db) {
+      const client = this.getClient();
+      this.db = client.db("price-watch");
+    }
+    return this.db;
+  }
+
+  public async connect(): Promise<void> {
+    try {
+      const client = this.getClient();
+      await client.connect();
+      await client.db("admin").command({ ping: 1 });
+      console.log("✅ Connected to MongoDB");
+    } catch (error) {
+      console.error("❌ MongoDB connection failed:", error);
+      throw error;
+    }
+  }
+
+  public async disconnect(): Promise<void> {
+    if (this.client) {
+      await this.client.close();
+      this.client = null;
+      this.db = null;
+      console.log("✅ Disconnected from MongoDB");
+    }
+  }
 }
- 
-// Export a module-scoped MongoClient. By doing this in a
-// separate module, the client can be shared across functions.
-export default client
+
+// Export singleton instance and client for NextAuth compatibility
+const dbConnection = DatabaseConnection.getInstance();
+export const client = dbConnection.getClient();
+export const getDb = () => dbConnection.getDb();
+export default client;

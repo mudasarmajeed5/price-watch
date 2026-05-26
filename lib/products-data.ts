@@ -228,7 +228,7 @@ const productsData = {
   collections: {
     homeWatchlist: ["p2", "p3", "p4", "p5"],
     homeRecentlyAdded: ["p6", "p7"],
-    viewAll: ["p8", "p9", "p10", "p10", "p9"],
+    viewAll: ["p8", "p10", "p9"],
     searchResults: ["p11", "p12", "p13", "p20"],
     watchlistGrid: ["p14", "p15", "p16", "p17", "p18", "p19"],
   },

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, Search, TrendingDown, Minus, Bell } from "lucide-react";
+import { Eye, TrendingDown, Minus, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -33,20 +33,12 @@ export default function HomePage() {
             </div>
             <span className="text-lg font-semibold">Bachat</span>
           </div>
-          <button className="w-9 h-9 rounded-full border flex items-center justify-center bg-muted/50">
-            <Bell size={16} className="text-muted-foreground" />
-          </button>
-        </div>
-        <div className="relative">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          />
-          <input
-            type="text"
-            placeholder="Search for products, deals, or brands…"
-            className="h-11 w-full rounded-xl border border-input bg-muted/50 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-emerald-600 focus:bg-background focus:ring-1 focus:ring-emerald-600/20"
-          />
+          <Link
+            href="/favorites"
+            className="w-9 h-9 rounded-full border flex items-center justify-center bg-muted/50 hover:bg-muted transition-colors"
+          >
+            <Heart size={16} className="text-muted-foreground" />
+          </Link>
         </div>
       </header>
 
