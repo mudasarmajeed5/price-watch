@@ -220,4 +220,3 @@ Web push requires:
 - Do we mark alerts as inactive after one notification or keep them active?
 - Should we allow multiple target prices per product per user?
 - Is the daily schedule fixed or configurable per user?
-

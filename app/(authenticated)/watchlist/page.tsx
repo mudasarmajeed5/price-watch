@@ -3,9 +3,9 @@ import Image from "next/image";
 import { ArrowLeft, TrendingDown, Minus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getCollection } from "@/lib/products";
+import productsData from "@/lib/products";
 
-const watchlistItems = getCollection("watchlistGrid");
+const watchlistItems = productsData.products;
 
 export default function WatchlistPage() {
   return (

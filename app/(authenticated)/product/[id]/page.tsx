@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { Heart } from "lucide-react";
+import { Check, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -20,21 +20,29 @@ export default function ProductPage() {
   const favorite = isFavorite(product.id);
 
   const [isTracking, setIsTracking] = useState(true);
-  const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [targetPrice, setTargetPrice] = useState("");
+  const [baselinePrice, setBaselinePrice] = useState("");
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setTargetPrice(product.price.toString());
-    setIsEditingTarget(false);
+    const priceValue = product.price.toString();
+    setTargetPrice(priceValue);
+    setBaselinePrice(priceValue);
   }, [product.id, product.price]);
 
-  const handleTargetAction = () => {
-    if (isEditingTarget && !targetPrice.trim()) return;
-    setIsEditingTarget((prev) => !prev);
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const isDirty = targetPrice.trim() !== "" && targetPrice !== baselinePrice;
+
+  const handleConfirmTarget = () => {
+    if (!targetPrice.trim()) return;
+    setBaselinePrice(targetPrice);
   };
 
   return (
-    <main className="flex-1 overflow-y-auto pb-24">
+    <main className="flex-1 min-h-[100svh] overflow-y-auto pb-24">
       <section className="relative">
         <div className="relative w-full aspect-[4/5] bg-muted overflow-hidden">
           <Image
@@ -95,43 +103,45 @@ export default function ProductPage() {
 
           <div className="h-px bg-border/60" />
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-end justify-between gap-3">
             <div className="flex-1">
               <p className="text-[11px] text-muted-foreground">Target price</p>
-              {isEditingTarget ? (
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  min="0"
-                  value={targetPrice}
-                  onChange={(event) => setTargetPrice(event.target.value)}
-                  className="mt-1 h-9 rounded-lg"
-                />
-              ) : (
-                <p className="mt-1 text-sm font-semibold">
-                  PKR{" "}
-                  {Number(targetPrice || product.price).toLocaleString("en-PK")}
-                </p>
-              )}
+              <Input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                value={targetPrice}
+                onChange={(event) => setTargetPrice(event.target.value)}
+                className="mt-1 h-9 rounded-lg"
+              />
             </div>
-            <Button
-              type="button"
-              size="sm"
-              variant={isEditingTarget ? "default" : "outline"}
-              className={
-                isEditingTarget ? "bg-emerald-700 hover:bg-emerald-800" : ""
-              }
-              onClick={handleTargetAction}
-            >
-              {isEditingTarget ? "Save" : "Change"}
-            </Button>
+            {isHydrated ? (
+              <Button
+                type="button"
+                size="icon-sm"
+                variant="outline"
+                onClick={handleConfirmTarget}
+                aria-label="Confirm target price"
+                disabled={!isDirty}
+                className={`shrink-0 self-end mb-0.5 transition-opacity ${
+                  isDirty ? "opacity-100" : "opacity-0 pointer-events-none"
+                }`}
+              >
+                <Check size={16} />
+              </Button>
+            ) : (
+              <span className="size-8 shrink-0 self-end mb-0.5" />
+            )}
           </div>
 
-          {!isTracking ? (
-            <p className="text-[11px] text-muted-foreground">
-              Tracking is off. Turn it on to get price alerts.
-            </p>
-          ) : null}
+          <p
+            className={`text-[11px] text-muted-foreground min-h-[16px] transition-opacity ${
+              isTracking ? "opacity-0" : "opacity-100"
+            }`}
+            aria-hidden={isTracking}
+          >
+            Tracking is off. Turn it on to get price alerts.
+          </p>
         </div>
       </section>
     </main>

@@ -13,20 +13,37 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getCollection } from "@/lib/products";
+import productsData from "@/lib/products";
 import { useFavorites } from "@/lib/use-favorites";
 
-const storeOptions = ["Outfitters", "BreakOut", "Saya", "Sana Safinaz"];
+const storeOptions = ["All", "Outfitters", "BreakOut", "Saya", "Sana Safinaz"];
 
-const results = getCollection("searchResults");
+const results = productsData.products;
 
 export default function SearchPage() {
-  const [activeStore, setActiveStore] = useState(storeOptions[0]);
+  const [activeStore, setActiveStore] = useState("All");
+  const [query, setQuery] = useState("");
   const { isFavorite, toggleFavorite } = useFavorites();
 
+  const normalizedQuery = query.trim().toLowerCase();
+
   const filteredResults = useMemo(
-    () => results.filter((item) => item.brand === activeStore),
-    [activeStore, results],
+    () =>
+      results.filter((item) => {
+        const matchesStore =
+          activeStore === "All" || item.category === activeStore;
+
+        if (!matchesStore) return false;
+        if (!normalizedQuery) return true;
+
+        const haystack = [item.name, item.brand, item.category]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return haystack.includes(normalizedQuery);
+      }),
+    [activeStore, normalizedQuery],
   );
 
   return (
@@ -58,6 +75,8 @@ export default function SearchPage() {
           <input
             type="text"
             placeholder="Search for products, deals, or brands..."
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
             className="h-11 w-full rounded-xl border border-input bg-muted/50 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-emerald-600 focus:bg-background focus:ring-1 focus:ring-emerald-600/20"
           />
         </div>
@@ -95,7 +114,9 @@ export default function SearchPage() {
           </div>
           <p className="text-[11px] text-muted-foreground mb-3">
             Showing Products of{" "}
-            <span className="text-foreground">"{activeStore}"</span>
+            <span className="text-foreground">
+              "{activeStore === "All" ? "All Stores" : activeStore}"
+            </span>
           </p>
         </section>
 
