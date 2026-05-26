@@ -18,7 +18,9 @@ export abstract class BaseRepository<T extends Document> {
   }
 
   async findById(id: ObjectId): Promise<T | null> {
-    return (await this.collection.findOne({ _id: id } as Filter<T>)) as T | null;
+    return (await this.collection.findOne({
+      _id: id,
+    } as Filter<T>)) as T | null;
   }
 
   async findOne(filter: Filter<T>): Promise<T | null> {

@@ -83,17 +83,17 @@ export default async function ProfilePage() {
             <div className="bg-muted/50 px-4 py-3 border-b">
               <h4 className="font-semibold text-sm">Notification Settings</h4>
               <p className="text-xs text-muted-foreground">
-                Choose what updates you want to receive.
+                Choose how you'd like to be notified.
               </p>
             </div>
             <div className="p-4 pb-1 flex flex-col gap-5">
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
                   <Label className="text-sm font-medium">
-                    Price Drop Alerts
+                    Push Notifications
                   </Label>
                   <p className="text-[11px] text-muted-foreground">
-                    Get notified when wishlist items drop in price.
+                    Receive instant alerts on your device.
                   </p>
                 </div>
                 <Switch defaultChecked />
@@ -101,21 +101,15 @@ export default async function ProfilePage() {
               <div className="flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
                   <Label className="text-sm font-medium">
-                    Weekly Deal Digs
+                    Email Notifications
                   </Label>
                   <p className="text-[11px] text-muted-foreground">
-                    Receive a weekly summary of the best tech deals.
+                    Get updates and summaries by email.
                   </p>
                 </div>
                 <Switch defaultChecked />
               </div>
             </div>
-            <button
-              type="submit"
-              className="mb-3 h-10 w-4/5 mx-auto rounded-xl bg-emerald-700 text-white text-sm font-medium hover:bg-emerald-800 active:scale-[0.99] transition-all disabled:opacity-60 flex items-center justify-center gap-2"
-            >
-              Save Changes
-            </button>
           </PopoverContent>
         </Popover>
 

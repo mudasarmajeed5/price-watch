@@ -114,7 +114,7 @@ export default function ProductPage() {
   return (
     <main className="flex-1 min-h-svh overflow-y-auto pb-24">
       <section className="relative">
-        <div className="relative w-full aspect-[4/5] bg-muted overflow-hidden">
+        <div className="relative w-full aspect-4/5 bg-muted overflow-hidden">
           <Image
             src={product.image || "/placeholder.png"}
             alt={product.title || "Product"}
@@ -209,7 +209,7 @@ export default function ProductPage() {
           </div>
 
           <p
-            className={`text-[11px] text-muted-foreground min-h-[16px] transition-opacity ${
+            className={`text-[11px] text-muted-foreground min-h-4 transition-opacity ${
               isTracking ? "opacity-0" : "opacity-100"
             }`}
             aria-hidden={isTracking}

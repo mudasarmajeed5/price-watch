@@ -77,7 +77,10 @@ export const getCollection = async (_key?: string): Promise<Product[]> => {
       const watchlist = await watchlistService.getUserWatchlist(user._id);
       return watchlist.map((item: any) => ({
         ...item,
-        createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : undefined,
+        createdAt:
+          item.createdAt instanceof Date
+            ? item.createdAt.toISOString()
+            : undefined,
       })) as Product[];
     }
 
