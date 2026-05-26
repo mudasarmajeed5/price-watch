@@ -11,10 +11,8 @@ import {
 import { format } from "date-fns";
 import { getCollection } from "@/lib/products";
 
-const watchlist = getCollection("homeWatchlist");
-const recentlyAdded = getCollection("homeRecentlyAdded");
-
-export default function HomePage() {
+export default async function HomePage() {
+  const watchlist = await getCollection();
   return (
     <>
       {/* Header */}
@@ -43,10 +41,10 @@ export default function HomePage() {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 overflow-y-auto pb-20 w-full">
         {/* Watchlist Carousel */}
-        <section className="pt-5">
-          <div className="flex items-center justify-between px-3 mb-3">
+        <section className="pt-3">
+          <div className="flex items-center justify-between px-3 mb-2">
             <h2 className="text-sm font-semibold">Your Watchlist</h2>
             <Link
               href="/watchlist"
@@ -57,33 +55,37 @@ export default function HomePage() {
           </div>
           <Carousel
             opts={{ align: "start", dragFree: true }}
-            className="w-full pb-2"
+            className="w-full pb-1"
           >
-            <CarouselContent className="pl-5 pr-5">
+            <CarouselContent className="pl-3 pr-3">
               {watchlist.map((item) => (
-                <CarouselItem key={item.id} className="basis-[75%] pl-3">
-                  <Link href={`/product/${item.id}`} className="block">
+                <CarouselItem
+                  key={String(item._id)}
+                  className="basis-[70%] pl-2"
+                >
+                  <Link href={`/product/${String(item._id)}`} className="block">
                     <Card className="rounded-xl border shadow-none">
                       <CardContent className="p-3">
                         <div className="relative w-full h-32 rounded-xl bg-emerald-50 overflow-hidden mb-3">
                           <Image
-                            src={item.image}
-                            alt={item.name}
+                            src={item.image || "/placeholder.png"}
+                            alt={item.title || "Product"}
                             fill
+                            loading="eager"
                             className="object-cover"
                             sizes="(max-width: 768px) 75vw, 300px"
                           />
                         </div>
                         <div className="flex flex-col gap-0.5">
                           <p className="text-sm font-semibold leading-snug line-clamp-1">
-                            {item.name}
+                            {item.title}
                           </p>
                           <p className="text-[11px] text-muted-foreground">
                             {item.brand}
                           </p>
                           <div className="mt-1.5 flex items-center justify-between">
                             <p className="text-base font-bold text-emerald-700">
-                              Rs. {item.price.toLocaleString()}
+                              Rs. {(item.latestPrice || 0).toLocaleString()}
                             </p>
                             {item.dropAmount && item.dropAmount > 0 ? (
                               <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[10px] px-1.5 py-0.5 gap-1">
@@ -95,7 +97,7 @@ export default function HomePage() {
                                 variant="secondary"
                                 className="text-[10px] px-1.5 py-0.5 gap-1 border-0"
                               >
-                                <Minus size={12} /> Same
+                                Target: Rs {item.targetPrice?.toLocaleString()}
                               </Badge>
                             )}
                           </div>
@@ -123,18 +125,18 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="flex flex-col gap-2.5 px-3">
-            {recentlyAdded.map((deal) => (
+            {watchlist.map((deal) => (
               <Link
-                key={deal.id}
-                href={`/product/${deal.id}`}
+                key={String(deal._id)}
+                href={`/product/${String(deal._id)}`}
                 className="block"
               >
                 <Card className="rounded-xl border shadow-none">
                   <CardContent className="p-2 py-0 flex items-center gap-3 relative">
                     <div className="relative w-16 h-16 rounded-lg bg-emerald-50/50 shrink-0 overflow-hidden">
                       <Image
-                        src={deal.image}
-                        alt={deal.name}
+                        src={deal.image || "/placeholder.png"}
+                        alt={deal.title || "Product"}
                         fill
                         className="object-cover"
                         sizes="64px"
@@ -142,25 +144,32 @@ export default function HomePage() {
                     </div>
                     <div className="flex-1 min-w-0 pr-8">
                       <p className="text-xs font-semibold leading-snug mb-1 line-clamp-1">
-                        {deal.name}
+                        {deal.title}
                       </p>
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                         <Badge
                           className={`text-[9px] px-1.5 py-0 border-0 ${
-                            deal.store === "Daraz"
+                            deal.store === "outfitters" ||
+                            deal.store === "Outfitters"
                               ? "bg-orange-50 text-orange-700 hover:bg-orange-50"
                               : "bg-blue-50 text-blue-700 hover:bg-blue-50"
                           }`}
                         >
                           {deal.store}
                         </Badge>
-                        <Badge className="bg-emerald-50 text-emerald-800 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0">
-                          ↓ {deal.discount}% Off
-                        </Badge>
+                        {deal.dropAmount === 0 || !deal.dropAmount ? (
+                          <Badge className="bg-slate-50 text-slate-700 hover:bg-slate-50 border-0 text-[9px] px-1.5 py-0">
+                            Target: Rs {deal.targetPrice?.toLocaleString()}
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-emerald-50 text-emerald-800 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0 gap-1">
+                            ↓ Rs {deal.dropAmount?.toLocaleString()} off target!
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-sm font-bold text-emerald-700">
-                          Rs. {deal.price.toLocaleString()}
+                          Rs. {(deal.latestPrice || 0).toLocaleString()}
                         </span>
                         {deal.originalPrice ? (
                           <span className="text-[10px] text-muted-foreground line-through">

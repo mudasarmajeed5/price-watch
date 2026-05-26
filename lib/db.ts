@@ -50,7 +50,7 @@ class DatabaseConnection {
   public getDb(): Db {
     if (!this.db) {
       const client = this.getClient();
-      this.db = client.db("price-watch");
+      this.db = client.db("bachat");
     }
     return this.db;
   }

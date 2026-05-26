@@ -46,6 +46,7 @@ export class WatchlistService {
 
   async getUserWatchlist(userId: ObjectId): Promise<
     Array<{
+      _id: ObjectId;
       alertId: ObjectId;
       productId: ObjectId;
       title: string;
@@ -53,36 +54,57 @@ export class WatchlistService {
       latestPrice: number;
       targetPrice: number;
       canonicalUrl: string;
+      store: string;
+      brand?: string;
+      discount?: number;
+      dropAmount?: number;
+      dropPercent?: number;
       createdAt: Date | undefined;
     }>
   > {
     try {
       const alerts = await this.alertRepo.getUserAlerts(userId);
 
-      const watchlist = await Promise.all(
-        alerts.map(async (alert) => {
-          const product = await this.productRepo.findById(alert.productId);
-          if (!product) {
-            throw new Error(`Product not found: ${alert.productId}`);
-          }
+      const watchlistPromises = alerts.map(async (alert) => {
+        const product = await this.productRepo.findById(alert.productId);
+        if (!product) {
+          console.warn(`Product not found for alert ${alert._id}, skipping...`);
+          return null;
+        }
 
-          return {
-            alertId: alert._id!,
-            productId: alert.productId,
-            title: product.title,
-            image: product.image,
-            latestPrice: product.latestPrice,
-            targetPrice: alert.targetPrice,
-            canonicalUrl: product.canonicalUrl,
-            createdAt: alert.createdAt,
-          };
-        }),
-      );
+        // Calculate discount/drop amount from target price
+        // If latestPrice is below targetPrice, show how much it dropped
+        const dropAmount = Math.max(0, alert.targetPrice - product.latestPrice);
+        const dropPercent =
+          alert.targetPrice > 0
+            ? Math.round((dropAmount / alert.targetPrice) * 100)
+            : 0;
+
+        return {
+          _id: alert.productId,
+          alertId: alert._id!,
+          productId: alert.productId,
+          title: product.title,
+          image: product.image,
+          latestPrice: product.latestPrice,
+          targetPrice: alert.targetPrice,
+          canonicalUrl: product.canonicalUrl,
+          store: product.store,
+          brand: (product as any).brand,
+          discount: dropPercent > 0 ? dropPercent : undefined,
+          dropAmount: dropAmount > 0 ? dropAmount : undefined,
+          dropPercent: dropPercent > 0 ? dropPercent : undefined,
+          createdAt: alert.createdAt,
+        };
+      });
+
+      const results = await Promise.all(watchlistPromises);
+      const watchlist = results.filter((item) => item !== null);
 
       return watchlist;
     } catch (error) {
       console.error("Error getting watchlist:", error);
-      throw error;
+      return [];
     }
   }
 
@@ -107,16 +129,27 @@ export class WatchlistService {
       const alert = await this.alertRepo.findOne({
         userId,
         productId,
+        isActive: true,
       } as any);
 
       if (!alert) {
+        console.warn(
+          `Alert not found for userId: ${userId}, productId: ${productId}`,
+        );
         throw new Error("Alert not found");
       }
 
-      await this.alertRepo.updateOne({ _id: alert._id! } as any, {
-        targetPrice: newTargetPrice,
-        updatedAt: new Date(),
-      });
+      const result = await this.alertRepo.updateOne(
+        { _id: alert._id! } as any,
+        {
+          targetPrice: newTargetPrice,
+          updatedAt: new Date(),
+        },
+      );
+
+      console.log(
+        `Updated target price for alert ${alert._id}: ${newTargetPrice}, matched: ${result.matchedCount}, modified: ${result.modifiedCount}`,
+      );
     } catch (error) {
       console.error("Error updating target price:", error);
       throw error;

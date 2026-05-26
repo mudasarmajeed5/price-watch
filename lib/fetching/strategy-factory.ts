@@ -1,8 +1,11 @@
-import { IProductFetchStrategy, FetchedProductData } from "./base.strategy";
-import { OutfittersStrategy } from "./outfitters.strategy";
-import { BreakoutStrategy } from "./breakout.strategy";
-import { SanaSafinazStrategy } from "./sana-safinaz.strategy";
-import { SayaStrategy } from "./saya.strategy";
+import {
+  IProductFetchStrategy,
+  FetchedProductData,
+} from "./strategies/base.strategy";
+import { OutfittersStrategy } from "./strategies/outfitters.strategy";
+import { BreakoutStrategy } from "./strategies/breakout.strategy";
+import { SanaSafinazStrategy } from "./strategies/sana-safinaz.strategy";
+import { SayaStrategy } from "./strategies/saya.strategy";
 
 export class StrategyFactory {
   private static strategies: IProductFetchStrategy[] = [

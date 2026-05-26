@@ -35,21 +35,29 @@ type ModalState = {
   description: string;
 } | null;
 
-const storeOptions = ["Outfitters", "BreakOut", "Saya", "Sana Safinaz"];
+const storeOptions = [
+  { value: "outfitters", label: "Outfitters" },
+  { value: "breakout", label: "BreakOut" },
+  { value: "saya", label: "Saya" },
+  { value: "sana_safinaz", label: "Sana Safinaz" },
+];
 
-async function fetchOutfittersProduct(url: string): Promise<Preview> {
-  const clean = url.split("?")[0].replace(/\/$/, "");
-  const jsonUrl = clean.endsWith(".json") ? clean : `${clean}.json`;
-  const res = await fetch(jsonUrl);
-  if (!res.ok) throw new Error(`Failed: ${res.status}`);
+async function fetchProductPreview(url: string): Promise<Preview> {
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:3000";
+  const res = await fetch(`${baseUrl}/api/preview`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || `Failed: ${res.status}`);
+  }
   const data = await res.json();
-  const product = data.product;
-  if (!product) throw new Error("Product not found");
-  return {
-    title: product.title,
-    image: product.images?.[0]?.src ?? "",
-    price: product.variants?.[0]?.price ?? "",
-  };
+  return data.data;
 }
 
 export default function Page() {
@@ -61,6 +69,7 @@ export default function Page() {
   const [products, setProducts] = useState<Product[]>([]);
   const [modal, setModal] = useState<ModalState>(null);
   const [targetPrice, setTargetPrice] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleFetch = async () => {
     const trimmed = link.trim();
@@ -72,22 +81,16 @@ export default function Page() {
       });
       return;
     }
-    if (store !== "Outfitters") {
-      setError("Only Outfitters is supported right now.");
-      return;
-    }
-    if (!trimmed.includes("outfitters.com.pk")) {
-      setError("Only Outfitters.com.pk links are supported.");
-      return;
-    }
     setError("");
     setPreview(null);
     setLoading(true);
     try {
-      const result = await fetchOutfittersProduct(trimmed);
+      const result = await fetchProductPreview(trimmed);
       setPreview(result);
     } catch (e) {
-      setError("Could not fetch product. Please check the link.");
+      setError(
+        e instanceof Error ? e.message : "Could not fetch product preview",
+      );
     } finally {
       setLoading(false);
     }
@@ -116,6 +119,72 @@ export default function Page() {
     setPreview(null);
     setLink("");
     setTargetPrice("");
+  };
+
+  const handleSubmitToBackend = async () => {
+    if (products.length === 0) {
+      setModal({
+        title: "No Products",
+        description: "Please add at least one product before submitting.",
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const baseUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost:3000";
+      const results = [];
+
+      for (const product of products) {
+        try {
+          const response = await fetch(`${baseUrl}/api/watchlist`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              url: product.url,
+              targetPrice: parseFloat(product.targetPrice || "0"),
+            }),
+          });
+
+          if (response.ok) {
+            results.push({ success: true, product });
+          } else {
+            const errorData = await response.json();
+            results.push({ success: false, product, error: errorData.error });
+          }
+        } catch (error) {
+          results.push({ success: false, product, error: String(error) });
+        }
+      }
+
+      const allSuccess = results.every((r) => r.success);
+      if (allSuccess) {
+        setModal({
+          title: "Success!",
+          description: `${products.length} product(s) added to watchlist. Redirecting...`,
+        });
+        setProducts([]);
+        setTimeout(() => {
+          window.location.href = "/watchlist";
+        }, 1500);
+      } else {
+        const failed = results.filter((r) => !r.success).length;
+        setModal({
+          title: "Partial Success",
+          description: `${results.filter((r) => r.success).length} of ${products.length} products added. ${failed} failed.`,
+        });
+      }
+    } catch (error) {
+      setModal({
+        title: "Error",
+        description: "Failed to submit products. Please try again.",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -157,8 +226,8 @@ export default function Page() {
                     </SelectTrigger>
                     <SelectContent className="w-(--radix-select-trigger-width)">
                       {storeOptions.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {option}
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -286,10 +355,7 @@ export default function Page() {
                   <Card key={p.id}>
                     <CardContent className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <Link
-                          href={`/product/${p.id}`}
-                          className="flex items-center gap-3 flex-1 min-w-0"
-                        >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className="relative size-16 shrink-0 rounded-lg overflow-hidden bg-muted">
                             <Image
                               src={p.image}
@@ -314,7 +380,7 @@ export default function Page() {
                               </p>
                             )}
                           </div>
-                        </Link>
+                        </div>
                         <button
                           onClick={() =>
                             setProducts((prev) =>
@@ -331,6 +397,19 @@ export default function Page() {
                   </Card>
                 ))}
               </div>
+              <Button
+                className="w-full mt-4 bg-emerald-700 hover:bg-emerald-600 text-white"
+                size="lg"
+                onClick={handleSubmitToBackend}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Bell className="mr-2 size-4" />
+                )}
+                {submitting ? "Submitting..." : "Add to Watchlist"}
+              </Button>
             </div>
           )}
         </div>

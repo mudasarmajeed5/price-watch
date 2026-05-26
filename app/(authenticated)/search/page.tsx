@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -13,17 +13,42 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import productsData from "@/lib/products";
+import { Product } from "@/lib/products";
 import { useFavorites } from "@/lib/use-favorites";
 
-const storeOptions = ["All", "Outfitters", "BreakOut", "Saya", "Sana Safinaz"];
-
-const results = productsData.products;
+const storeOptions = ["All", "outfitters", "breakout", "saya", "sana_safinaz"];
 
 export default function SearchPage() {
   const [activeStore, setActiveStore] = useState("All");
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const { isFavorite, toggleFavorite } = useFavorites();
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const baseUrl =
+          typeof window !== "undefined"
+            ? window.location.origin
+            : "http://localhost:3000";
+        const response = await fetch(`${baseUrl}/api/watchlist`, {
+          cache: "no-store",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setResults(data.data || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const normalizedQuery = query.trim().toLowerCase();
 
@@ -31,19 +56,19 @@ export default function SearchPage() {
     () =>
       results.filter((item) => {
         const matchesStore =
-          activeStore === "All" || item.category === activeStore;
+          activeStore === "All" || item.store === activeStore;
 
         if (!matchesStore) return false;
         if (!normalizedQuery) return true;
 
-        const haystack = [item.name, item.brand, item.category]
+        const haystack = [item.title, item.brand, item.store]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
 
         return haystack.includes(normalizedQuery);
       }),
-    [activeStore, normalizedQuery],
+    [activeStore, normalizedQuery, results],
   );
 
   return (
@@ -131,76 +156,79 @@ export default function SearchPage() {
           ) : (
             <div className="flex flex-col gap-3">
               {filteredResults.map((item) => {
-                const favorite = isFavorite(item.id);
+                const favorite = isFavorite(String(item._id));
                 return (
-                  <Card
-                    key={item.id}
-                    className="rounded-2xl border shadow-none"
+                  <Link
+                    key={String(item._id)}
+                    href={`/product/${String(item._id)}`}
+                    className="block"
                   >
-                    <CardContent className="p-2.5 flex gap-3 items-stretch">
-                      <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                          sizes="80px"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold leading-snug line-clamp-2">
-                          {item.name}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {item.brand}
-                        </p>
-                        <div className="mt-2 flex items-baseline gap-2">
-                          <span className="text-sm font-bold text-emerald-700">
-                            PKR {item.price.toLocaleString("en-PK")}
-                          </span>
-                          {item.originalPrice ? (
-                            <span className="text-[10px] text-muted-foreground line-through">
-                              PKR {item.originalPrice.toLocaleString("en-PK")}
+                    <Card className="rounded-2xl border shadow-none hover:shadow-md transition-shadow cursor-pointer">
+                      <CardContent className="p-2.5 flex gap-3 items-stretch">
+                        <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-muted shrink-0">
+                          <Image
+                            src={item.image || "/placeholder.png"}
+                            alt={item.title || "Product"}
+                            fill
+                            loading="eager"
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold leading-snug line-clamp-2">
+                            {item.title}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {item.brand}
+                          </p>
+                          <div className="mt-2 flex items-baseline gap-2">
+                            <span className="text-sm font-bold text-emerald-700">
+                              PKR{" "}
+                              {(item.latestPrice || 0).toLocaleString("en-PK")}
                             </span>
+                            {item.originalPrice ? (
+                              <span className="text-[10px] text-muted-foreground line-through">
+                                PKR {item.originalPrice.toLocaleString("en-PK")}
+                              </span>
+                            ) : null}
+                          </div>
+                          {item.dropPercent ? (
+                            <Badge className="mt-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0.5 gap-1 inline-flex items-center">
+                              <TrendingDown size={10} /> {item.dropPercent}%
+                              Price Drop
+                            </Badge>
                           ) : null}
                         </div>
-                        {item.dropPercent ? (
-                          <Badge className="mt-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0.5 gap-1 inline-flex items-center">
-                            <TrendingDown size={10} /> {item.dropPercent}% Price
-                            Drop
-                          </Badge>
-                        ) : null}
-                      </div>
-                      <div className="flex flex-col items-end justify-between">
-                        <button
-                          type="button"
-                          aria-label={
-                            favorite
-                              ? "Remove from favorites"
-                              : "Add to favorites"
-                          }
-                          aria-pressed={favorite}
-                          onClick={() => toggleFavorite(item.id)}
-                          className={`h-7 w-7 rounded-full border flex items-center justify-center transition-colors ${
-                            favorite
-                              ? "border-red-200 bg-red-50 text-red-500"
-                              : "bg-background text-muted-foreground"
-                          }`}
-                        >
-                          <Heart
-                            size={14}
-                            fill={favorite ? "currentColor" : "none"}
-                          />
-                        </button>
-                        <Button
-                          asChild
-                          className="h-7 px-3 text-[10px] rounded-lg bg-emerald-700 hover:bg-emerald-800"
-                        >
-                          <Link href={`/product/${item.id}`}>View</Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <div className="flex flex-col items-end justify-between">
+                          <button
+                            type="button"
+                            aria-label={
+                              favorite
+                                ? "Remove from favorites"
+                                : "Add to favorites"
+                            }
+                            aria-pressed={favorite}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              toggleFavorite(String(item._id));
+                            }}
+                            className={`h-7 w-7 rounded-full border flex items-center justify-center transition-colors ${
+                              favorite
+                                ? "border-red-200 bg-red-50 text-red-500"
+                                : "bg-background text-muted-foreground"
+                            }`}
+                          >
+                            <Heart
+                              size={14}
+                              fill={favorite ? "currentColor" : "none"}
+                            />
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 );
               })}
             </div>

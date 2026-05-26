@@ -20,8 +20,8 @@ export default function AuthenticatedLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex flex-col min-h-screen bg-muted/40 max-w-sm mx-auto relative">
-      <div className="flex-1 pb-20">{children}</div>
+    <div className="flex flex-col min-h-screen bg-muted/40 max-w-sm mx-auto relative w-full">
+      <div className="flex-1 pb-20 w-full">{children}</div>
 
       {/* Bottom Nav */}
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-sm bg-background border-t flex items-center justify-around px-2 py-2 z-10">
