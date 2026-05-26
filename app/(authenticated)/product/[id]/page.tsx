@@ -10,12 +10,14 @@ import { Switch } from "@/components/ui/switch";
 import { Product } from "@/lib/products";
 import { useFavorites } from "@/lib/use-favorites";
 
+type ProductWithTarget = Product & { targetPrice?: number };
+
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
   const productId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState<ProductWithTarget | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTracking, setIsTracking] = useState(true);
   const [targetPrice, setTargetPrice] = useState("");
@@ -49,7 +51,7 @@ export default function ProductPage() {
   }, [productId]);
 
   useEffect(() => {
-    if (product && product.targetPrice) {
+    if (product?.targetPrice) {
       const priceValue = product.targetPrice.toString();
       setTargetPrice(priceValue);
       setBaselinePrice(priceValue);
@@ -110,7 +112,7 @@ export default function ProductPage() {
   };
 
   return (
-    <main className="flex-1 min-h-[100svh] overflow-y-auto pb-24">
+    <main className="flex-1 min-h-svh overflow-y-auto pb-24">
       <section className="relative">
         <div className="relative w-full aspect-[4/5] bg-muted overflow-hidden">
           <Image

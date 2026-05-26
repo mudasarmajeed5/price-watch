@@ -33,8 +33,11 @@ export class PriceSnapshotRepository extends BaseRepository<PriceSnapshot> {
   }
 
   async getLatestSnapshot(productId: ObjectId): Promise<PriceSnapshot | null> {
-    return await this.collection
-      .findOne({ productId } as Filter<PriceSnapshot>)
-      .sort({ checkedAt: -1 });
+    const results = await this.collection
+      .find({ productId } as Filter<PriceSnapshot>)
+      .sort({ checkedAt: -1 })
+      .limit(1)
+      .toArray();
+    return results[0] || null;
   }
 }

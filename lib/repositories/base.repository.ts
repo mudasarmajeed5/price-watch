@@ -5,10 +5,11 @@ import {
   InsertOneResult,
   UpdateResult,
   ObjectId,
+  Document,
 } from "mongodb";
 import { getDb } from "@/lib/db";
 
-export abstract class BaseRepository<T> {
+export abstract class BaseRepository<T extends Document> {
   protected collection: Collection<T>;
 
   constructor(collectionName: string) {
@@ -17,26 +18,26 @@ export abstract class BaseRepository<T> {
   }
 
   async findById(id: ObjectId): Promise<T | null> {
-    return await this.collection.findOne({ _id: id } as Filter<T>);
+    return (await this.collection.findOne({ _id: id } as Filter<T>)) as T | null;
   }
 
   async findOne(filter: Filter<T>): Promise<T | null> {
-    return await this.collection.findOne(filter);
+    return (await this.collection.findOne(filter)) as T | null;
   }
 
   async find(filter: Filter<T>, limit = 0): Promise<T[]> {
-    return await this.collection.find(filter).limit(limit).toArray();
+    return (await this.collection.find(filter).limit(limit).toArray()) as T[];
   }
 
-  async create(document: Omit<T, "_id">): Promise<InsertOneResult> {
+  async create(document: Omit<T, "_id">): Promise<InsertOneResult<T>> {
     return await this.collection.insertOne(document as any);
   }
 
-  async updateOne(filter: Filter<T>, update: any): Promise<UpdateResult> {
+  async updateOne(filter: Filter<T>, update: any): Promise<UpdateResult<T>> {
     return await this.collection.updateOne(filter, { $set: update });
   }
 
-  async updateMany(filter: Filter<T>, update: any): Promise<UpdateResult> {
+  async updateMany(filter: Filter<T>, update: any): Promise<UpdateResult<T>> {
     return await this.collection.updateMany(filter, { $set: update });
   }
 

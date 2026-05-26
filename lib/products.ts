@@ -75,7 +75,10 @@ export const getCollection = async (_key?: string): Promise<Product[]> => {
 
       const watchlistService = new WatchlistService();
       const watchlist = await watchlistService.getUserWatchlist(user._id);
-      return watchlist;
+      return watchlist.map((item: any) => ({
+        ...item,
+        createdAt: item.createdAt instanceof Date ? item.createdAt.toISOString() : undefined,
+      })) as Product[];
     }
 
     // Client-side: use API with baseUrl

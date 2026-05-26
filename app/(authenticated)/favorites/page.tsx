@@ -82,8 +82,8 @@ export default function FavoritesPage() {
             <div className="flex flex-col gap-3">
               {products.map((item) => (
                 <Link
-                  key={String(item._id || item.productId)}
-                  href={`/product/${String(item._id || item.productId)}`}
+                  key={String(item._id)}
+                  href={`/product/${String(item._id)}`}
                   className="block"
                 >
                   <Card className="rounded-2xl border shadow-none bg-background">
