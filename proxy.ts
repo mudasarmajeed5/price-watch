@@ -1,20 +1,49 @@
-import { auth } from "@/auth"
+import { auth } from "@/auth";
 
 export const proxy = auth((req) => {
+  const { pathname } = req.nextUrl;
+
+  // 🚨 PWA + public assets MUST NEVER be blocked or redirected
+  if (
+    pathname.startsWith("/sw.js") ||
+    pathname.startsWith("/manifest.webmanifest") ||
+    pathname.startsWith("/manifest.json") ||
+    pathname.startsWith("/icon") ||
+    pathname.startsWith("/icons") ||
+    pathname.startsWith("/favicon.ico") ||
+    pathname.startsWith("/robots.txt") ||
+    pathname.startsWith("/sitemap.xml")
+  ) {
+    return;
+  }
+
   const isLoggedIn = !!req.auth;
-  const isOnAuthPage = req.nextUrl.pathname.startsWith('/login') || req.nextUrl.pathname.startsWith('/signup');
 
+  const isOnAuthPage =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup");
+
+  // If logged in, prevent going back to auth pages
   if (isLoggedIn && isOnAuthPage) {
-    return Response.redirect(new URL('/', req.nextUrl));
+    return Response.redirect(new URL("/", req.nextUrl));
   }
 
-  if (!isLoggedIn && !isOnAuthPage && !req.nextUrl.pathname.startsWith('/api')) {
-    // You can also add more public routes like /otp if they shouldn't require auth
-    return Response.redirect(new URL('/login', req.nextUrl));
+  // Protect everything except:
+  // - auth pages
+  // - API routes
+  // - public assets (already filtered above)
+  if (
+    !isLoggedIn &&
+    !isOnAuthPage &&
+    !pathname.startsWith("/api")
+  ) {
+    return Response.redirect(new URL("/login", req.nextUrl));
   }
-})
+});
 
-// Optionally, don't invoke Middleware on some paths
+// IMPORTANT: exclude middleware from static + API routes
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|images|favicon.ico).*)"],
-}
+  matcher: [
+    "/((?!api|_next/static|_next/image|images|icons|favicon.ico).*)",
+  ],
+};
