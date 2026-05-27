@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       data: {
         title: data.title,
         image: data.image,
-        price: data.currentPrice,
+        price: data.price,
       },
     });
   } catch (error) {

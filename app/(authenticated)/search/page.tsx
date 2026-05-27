@@ -73,41 +73,22 @@ export default function SearchPage() {
 
   return (
     <>
-      <header className="bg-background border-b px-3 pt-4 pb-3 sticky top-0 z-10">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center rounded bg-emerald-50">
-              <Image
-                src="/app_logo.svg"
-                alt="Bachat"
-                width={20}
-                height={20}
-                className="h-5 w-5"
-                priority
-              />
-            </div>
-            <span className="text-lg font-semibold">Bachat</span>
-          </div>
-          <button className="w-9 h-9 rounded-full border flex items-center justify-center bg-muted/50">
-            <Bell size={16} className="text-muted-foreground" />
-          </button>
-        </div>
-        <div className="relative">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-          />
-          <input
-            type="text"
-            placeholder="Search for products, deals, or brands..."
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className="h-11 w-full rounded-xl border border-input bg-muted/50 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-emerald-600 focus:bg-background focus:ring-1 focus:ring-emerald-600/20"
-          />
-        </div>
-      </header>
-
       <main className="flex-1 overflow-y-auto pb-20">
+        <section className="px-3 pt-4">
+          <div className="relative mb-4">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <input
+              type="text"
+              placeholder="Search for products, deals, or brands..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="h-11 w-full rounded-xl border border-input bg-muted/50 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-emerald-600 focus:bg-background focus:ring-1 focus:ring-emerald-600/20"
+            />
+          </div>
+        </section>
         <section className="px-3 pt-4">
           <div className="flex items-center gap-2 mb-3">
             <button
@@ -184,7 +165,8 @@ export default function SearchPage() {
                           </p>
                           <div className="mt-2 flex items-baseline gap-2">
                             <span className="text-sm font-bold text-emerald-700">
-                              PKR {(item.latestPrice || 0).toLocaleString("en-PK")}
+                              PKR{" "}
+                              {(item.latestPrice || 0).toLocaleString("en-PK")}
                             </span>
                             {item.originalPrice ? (
                               <span className="text-[10px] text-muted-foreground line-through">

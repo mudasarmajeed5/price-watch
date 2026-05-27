@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getCollection } from "@/lib/products";
@@ -9,21 +8,6 @@ export default async function ViewAllPage() {
   const recentlyAdded = await getCollection();
   return (
     <>
-      <header className="bg-background border-b px-3 py-4 sticky top-0 z-10 flex items-center gap-3">
-        <Link
-          href="/"
-          className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted transition-colors"
-        >
-          <ArrowLeft size={20} className="text-foreground" />
-        </Link>
-        <div className="flex flex-col">
-          <h1 className="text-lg font-semibold">Recently Added</h1>
-          <span className="text-[11px] text-muted-foreground">
-            Deals added in the last few days
-          </span>
-        </div>
-      </header>
-
       <main className="flex-1 overflow-y-auto pb-20">
         <section className="px-3 py-4">
           <div className="flex flex-col gap-3">

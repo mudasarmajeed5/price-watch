@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Heart } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useFavorites } from "@/lib/use-favorites";
@@ -50,21 +50,6 @@ export default function FavoritesPage() {
 
   return (
     <>
-      <header className="bg-background border-b px-3 py-4 sticky top-0 z-10 flex items-center gap-3">
-        <Link
-          href="/"
-          className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted transition-colors"
-        >
-          <ArrowLeft size={20} className="text-foreground" />
-        </Link>
-        <div className="flex flex-col">
-          <h1 className="text-lg font-semibold">Your Favorites</h1>
-          <span className="text-[11px] text-muted-foreground">
-            {products.length} product{products.length !== 1 ? "s" : ""} saved
-          </span>
-        </div>
-      </header>
-
       <main className="flex-1 overflow-y-auto pb-20">
         <section className="px-3 py-4">
           {products.length === 0 ? (

@@ -2,16 +2,22 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, TrendingDown, Minus, Trash2, Loader2 } from "lucide-react";
+import { TrendingDown, Minus, Trash2, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getCollection } from "@/lib/products";
+import { Dialog } from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { Product } from "@/lib/products";
 import { useEffect, useState } from "react";
 
 export default function WatchlistPage() {
-  const [watchlistItems, setWatchlistItems] = useState([]);
+  const [watchlistItems, setWatchlistItems] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteCandidate, setDeleteCandidate] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
 
   useEffect(() => {
     const fetchWatchlist = async () => {
@@ -35,9 +41,8 @@ export default function WatchlistPage() {
   }, []);
 
   const handleDelete = async (productId: string) => {
-    if (!window.confirm("Remove this product from your watchlist?")) return;
-
     setDeletingId(productId);
+
     try {
       const baseUrl = window.location.origin;
       const response = await fetch(`${baseUrl}/api/watchlist`, {
@@ -50,14 +55,16 @@ export default function WatchlistPage() {
         setWatchlistItems((prev) =>
           prev.filter((item) => String(item._id) !== productId),
         );
+        toast.success("Removed from watchlist");
       } else {
-        alert("Failed to remove product");
+        toast.error("Failed to remove product");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Error removing product");
+      toast.error("Error removing product");
     } finally {
       setDeletingId(null);
+      setDeleteCandidate(null);
     }
   };
 
@@ -70,20 +77,11 @@ export default function WatchlistPage() {
   }
   return (
     <>
-      {/* Header */}
-      <header className="bg-background border-b px-3 py-4 sticky top-0 z-10 flex items-center gap-3">
-        <Link
-          href="/"
-          className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted transition-colors"
-        >
-          <ArrowLeft size={20} className="text-foreground" />
-        </Link>
-        <h1 className="text-lg font-semibold">Watchlist</h1>
-      </header>
-
-      {/* Main content */}
       <main className="flex-1 overflow-y-auto pb-20">
         <div className="px-3 py-4">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">Watchlist</h2>
+          </div>
           {watchlistItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <p className="text-muted-foreground mb-4">
@@ -100,7 +98,7 @@ export default function WatchlistPage() {
               {watchlistItems.map((item) => (
                 <div
                   key={String(item._id)}
-                  className="relative rounded-xl border overflow-hidden flex flex-col h-full group"
+                  className="relative rounded-xl overflow-hidden flex flex-col h-full group shadow border p-1"
                 >
                   <Link href={`/product/${String(item._id)}`} className="block">
                     <div className="p-1 pt-0 pb-1.5 flex-1 flex flex-col relative">
@@ -136,46 +134,82 @@ export default function WatchlistPage() {
                               </span>
                             ) : null}
                           </div>
-
-                          <div className="flex items-center justify-between gap-1">
-                            {item.discount && (
-                              <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0">
-                                ↓ {item.discount}% Off
-                              </Badge>
-                            )}
-                            {item.status && (
-                              <Badge
-                                className={`text-[9px] px-1.5 py-0 border-0 ${
-                                  item.status === "in stock now"
-                                    ? "bg-green-50 text-green-700 hover:bg-green-50"
-                                    : "bg-red-50 text-red-700 hover:bg-red-50"
-                                }`}
-                              >
-                                {item.status}
-                              </Badge>
-                            )}
-                          </div>
                         </div>
                       </div>
                     </div>
                   </Link>
-                  <button
-                    onClick={() => handleDelete(String(item._id))}
-                    disabled={deletingId === String(item._id)}
-                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white rounded-lg p-1.5"
-                  >
-                    {deletingId === String(item._id) ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <Trash2 size={14} />
+                  <div className="flex items-center justify-between gap-1">
+                    {item.discount && (
+                      <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0">
+                        ↓ {item.discount}% Off
+                      </Badge>
                     )}
-                  </button>
+                    {item.status && (
+                      <Badge
+                        className={`text-[9px] px-1.5 py-0 border-0 ${
+                          item.status === "in stock now"
+                            ? "bg-green-50 text-green-700 hover:bg-green-50"
+                            : "bg-red-50 text-red-700 hover:bg-red-50"
+                        }`}
+                      >
+                        {item.status}
+                      </Badge>
+                    )}
+                    <button
+                      onClick={() =>
+                        setDeleteCandidate({
+                          id: String(item._id),
+                          title: item.title || "this product",
+                        })
+                      }
+                      disabled={deletingId === String(item._id)}
+                      className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-700 hover:bg-red-100 transition-colors disabled:opacity-50"
+                      aria-label="Remove item"
+                    >
+                      {deletingId === String(item._id) ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={14} />
+                      )}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
       </main>
+      <Dialog
+        className="bg-white rounded-lg p-6 shadow-lg"
+        open={Boolean(deleteCandidate)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteCandidate(null);
+        }}
+        title="Remove item from watchlist"
+        description={`Are you sure you want to remove ${deleteCandidate?.title ?? "this item"} from your watchlist?`}
+      >
+        <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+          <Button
+            variant="secondary"
+            onClick={() => setDeleteCandidate(null)}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => deleteCandidate && handleDelete(deleteCandidate.id)}
+            disabled={deletingId === deleteCandidate?.id}
+            className="w-full sm:w-auto"
+          >
+            {deletingId === deleteCandidate?.id ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              "Remove"
+            )}
+          </Button>
+        </div>
+      </Dialog>
     </>
   );
 }

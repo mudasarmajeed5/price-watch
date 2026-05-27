@@ -15,32 +15,6 @@ export default async function HomePage() {
   const watchlist = await getCollection();
   return (
     <>
-      {/* Header */}
-      <header className="bg-background border-b px-3 pt-4 pb-3 sticky top-0 z-10">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center justify-center rounded bg-emerald-50">
-              <Image
-                src="/app_logo.svg"
-                alt="Bachat"
-                width={20}
-                height={20}
-                className="h-5 w-5"
-                priority
-              />
-            </div>
-            <span className="text-lg font-semibold">Bachat</span>
-          </div>
-          <Link
-            href="/favorites"
-            className="w-9 h-9 rounded-full border flex items-center justify-center bg-muted/50 hover:bg-muted transition-colors"
-          >
-            <Heart size={16} className="text-muted-foreground" />
-          </Link>
-        </div>
-      </header>
-
-      {/* Main content */}
       <main className="flex-1 overflow-y-auto pb-20 w-full">
         {/* Watchlist Carousel */}
         <section className="pt-3">
@@ -64,7 +38,7 @@ export default async function HomePage() {
                   className="basis-[60%] pl-2"
                 >
                   <Link href={`/product/${String(item._id)}`} className="block">
-                    <Card className="rounded-xl border shadow-none">
+                    <Card className="rounded-xl shadow-sm ring-0 hover:shadow-md transition-shadow duration-200">
                       <CardContent className="px-2 py-2">
                         <div className="relative w-full h-44 rounded-xl bg-emerald-50 overflow-hidden mb-2">
                           <Image
@@ -131,7 +105,7 @@ export default async function HomePage() {
                 href={`/product/${String(deal._id)}`}
                 className="block"
               >
-                <Card className="rounded-xl border shadow-none">
+                <Card className="rounded-xl shadow-sm ring-0 hover:shadow-md transition-shadow duration-200">
                   <CardContent className="p-2.5 flex gap-3 items-stretch relative">
                     <div className="relative w-20 h-28 rounded-xl overflow-hidden bg-emerald-50/50 shrink-0">
                       <Image

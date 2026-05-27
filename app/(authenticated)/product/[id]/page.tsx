@@ -2,25 +2,28 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
-import { Check, Heart, Loader2 } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { Check, Heart, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Product } from "@/lib/products";
 import { useFavorites } from "@/lib/use-favorites";
+import { toast } from "sonner";
 
 type ProductWithTarget = Product & { targetPrice?: number };
 
 export default function ProductPage() {
   const params = useParams<{ id: string }>();
   const productId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [product, setProduct] = useState<ProductWithTarget | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTracking, setIsTracking] = useState(true);
   const [targetPrice, setTargetPrice] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
   const [baselinePrice, setBaselinePrice] = useState("");
   const [isHydrated, setIsHydrated] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -82,6 +85,37 @@ export default function ProductPage() {
 
   const isDirty = targetPrice.trim() !== "" && targetPrice !== baselinePrice;
 
+  const handleDelete = async () => {
+    if (!productId) return;
+
+    setIsDeleting(true);
+    try {
+      const baseUrl =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "http://localhost:3000";
+      const response = await fetch(`${baseUrl}/api/watchlist`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productId }),
+      });
+
+      if (response.ok) {
+        toast.success("Removed from watchlist");
+        router.push("/watchlist");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to remove from watchlist:", errorData);
+        toast.error("Could not remove from watchlist");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Error removing from watchlist");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleConfirmTarget = async () => {
     if (!targetPrice.trim()) return;
 
@@ -126,19 +160,34 @@ export default function ProductPage() {
             priority
           />
         </div>
-        <button
-          type="button"
-          aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-          aria-pressed={favorite}
-          onClick={() => toggleFavorite(String(product._id))}
-          className={`absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors ${
-            favorite
-              ? "border-red-200 bg-red-50 text-red-500"
-              : "bg-background/90 text-muted-foreground"
-          }`}
-        >
-          <Heart size={18} fill={favorite ? "currentColor" : "none"} />
-        </button>
+        <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+          <button
+            type="button"
+            aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+            aria-pressed={favorite}
+            onClick={() => toggleFavorite(String(product._id))}
+            className={`flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors ${
+              favorite
+                ? "border-red-200 bg-red-50 text-red-500"
+                : "bg-background/90 text-muted-foreground"
+            }`}
+          >
+            <Heart size={18} fill={favorite ? "currentColor" : "none"} />
+          </button>
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            aria-label="Remove from watchlist"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700 shadow-sm transition-colors hover:bg-red-100 disabled:opacity-50"
+          >
+            {isDeleting ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Trash2 size={18} />
+            )}
+          </button>
+        </div>
       </section>
 
       <section className="px-4 pt-5">
@@ -172,7 +221,6 @@ export default function ProductPage() {
             </div>
             <Switch checked={isTracking} onCheckedChange={setIsTracking} />
           </div>
-
           <div className="h-px bg-border/60" />
 
           <div className="flex items-end justify-between gap-3">
