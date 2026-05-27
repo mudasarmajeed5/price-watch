@@ -15,11 +15,14 @@ export class PushNotification implements INotification {
     const privateKey = process.env.VAPID_PRIVATE_KEY;
 
     if (publicKey && privateKey) {
-      webpush.setVapidDetails(
-        process.env.VAPID_EMAIL || "admin@price-watch.app",
-        publicKey,
-        privateKey,
-      );
+      // Ensure the VAPID subject is a valid mailto: or https: URL
+      const rawSubject = process.env.VAPID_EMAIL || "admin@price-watch.app";
+      const subject =
+        rawSubject.startsWith("mailto:") || rawSubject.startsWith("https:")
+          ? rawSubject
+          : `mailto:${rawSubject}`;
+
+      webpush.setVapidDetails(subject, publicKey, privateKey);
     }
   }
 
