@@ -9,27 +9,26 @@ import { Loader2 } from "lucide-react";
 export function EmailSignInForm() {
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
-
-    // 🚀 show success immediately (optimistic UX)
-    toast.success("Check your email!", {
-      description: "We have sent you a magic link.",
-    });
-
-    setLoading(false);
 
     const res = await signIn("nodemailer", {
       email,
       redirect: false,
     });
 
+    setLoading(false);
+
     if (res?.error) {
       toast.error("Failed to send login email. Please try again.");
+    } else {
+      toast.success("Check your email!", {
+          description: "A magic link has been sent to your email address.",
+          
+        });
     }
   };
 

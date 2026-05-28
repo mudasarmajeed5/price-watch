@@ -1,12 +1,8 @@
 import { auth, signOut } from "@/auth";
 import {
   LogOut,
-  Bell,
-  BellOff,
-  Trash2,
   ChevronRight,
   Settings,
-  Loader2,
 } from "lucide-react";
 import {
   Popover,

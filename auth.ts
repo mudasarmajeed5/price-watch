@@ -24,11 +24,28 @@ async function sendVerificationRequest(params: any) {
       </body>
     `,
   });
-  
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  session: {
+    strategy: "jwt",
+  },
   adapter: MongoDBAdapter(client),
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.image = user.image;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      session.user.id = token.id as string;
+      return session;
+    },
+  },
   pages: {
     signIn: "/login",
     newUser: "/onboarding", // New users will be directed here on first sign in

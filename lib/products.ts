@@ -58,46 +58,36 @@ export const getProductById = async (id: string): Promise<Product | null> => {
  */
 export const getCollection = async (_key?: string): Promise<Product[]> => {
   try {
-    // Check if we're on the server
-    if (typeof window === "undefined") {
-      // Server-side: call service directly
-      const session = await auth();
-      if (!session?.user?.email) {
+    // Client-side: use API
+    if (typeof window !== "undefined") {
+      const baseUrl = window.location.origin;
+      const response = await fetch(`${baseUrl}/api/watchlist`, {
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        console.error("Failed to fetch watchlist:", response.statusText);
         return [];
       }
-
-      const db = getDb();
-      const user = await db
-        .collection("users")
-        .findOne({ email: session.user.email });
-      if (!user) {
-        return [];
-      }
-
-      const watchlistService = new WatchlistService();
-      const watchlist = await watchlistService.getUserWatchlist(user._id);
-      return watchlist.map((item: any) => ({
-        ...item,
-        createdAt:
-          item.createdAt instanceof Date
-            ? item.createdAt.toISOString()
-            : undefined,
-      })) as Product[];
+      const data = await response.json();
+      return data.data || [];
     }
 
-    // Client-side: use API with baseUrl
-    const baseUrl = window.location.origin;
-    const response = await fetch(`${baseUrl}/api/watchlist`, {
-      cache: "no-store",
-    });
+    // Server-side: call service directly
+    const session = await auth();
+    if (!session?.user?.id) return [];
 
-    if (!response.ok) {
-      console.error("Failed to fetch watchlist:", response.statusText);
-      return [];
-    }
+    const watchlistService = new WatchlistService();
+    const watchlist = await watchlistService.getUserWatchlist(
+      new ObjectId(session.user.id),
+    );
 
-    const data = await response.json();
-    return data.data || [];
+    return watchlist.map((item: any) => ({
+      ...item,
+      createdAt:
+        item.createdAt instanceof Date
+          ? item.createdAt.toISOString()
+          : undefined,
+    })) as Product[];
   } catch (error) {
     console.error("Error fetching watchlist:", error);
     return [];
