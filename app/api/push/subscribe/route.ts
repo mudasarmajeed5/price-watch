@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { PushSubscriptionRepository } from "@/lib/repositories/push-subscription.repository";
 import { ObjectId } from "mongodb";
+import { UserRepository } from "@/lib/repositories/user.repository";
 
 const subscriptionRepo = new PushSubscriptionRepository();
+const userRepo = new UserRepository();
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,9 +23,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get user ID from session (you'd need to fetch this from the database)
-    // For now, this is a placeholder
-    const userId = new ObjectId(); // Replace with actual user ID from DB
+    let userId: ObjectId | null = null;
+
+    if (session.user?.id && ObjectId.isValid(session.user.id)) {
+      userId = new ObjectId(session.user.id);
+    } else if (session.user?.email) {
+      const user = await userRepo.findByEmail(session.user.email);
+      if (user?._id) {
+        userId = user._id;
+      }
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Unable to resolve user account" },
+        { status: 400 },
+      );
+    }
 
     const subscriptionId = await subscriptionRepo.saveSubscription(
       userId,

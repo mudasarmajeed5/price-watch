@@ -112,6 +112,8 @@ export async function POST(request: NextRequest) {
           }
         }
 
+        await notificationService.processPendingNotifications();
+
         console.log(
           `🎉 [CRON] Daily check completed at ${new Date().toISOString()}`,
         );

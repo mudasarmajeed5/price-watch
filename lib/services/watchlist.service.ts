@@ -1,16 +1,20 @@
 import { ObjectId } from "mongodb";
 import { ProductRepository } from "@/lib/repositories/product.repository";
 import { PriceAlertRepository } from "@/lib/repositories/price-alert.repository";
+import { NotificationQueueRepository } from "@/lib/repositories/notification-queue.repository";
 import { PriceService } from "./price.service";
+import { NotificationPayload } from "@/lib/types/notification";
 
 export class WatchlistService {
   private productRepo: ProductRepository;
   private alertRepo: PriceAlertRepository;
+  private queueRepo: NotificationQueueRepository;
   private priceService: PriceService;
 
   constructor() {
     this.productRepo = new ProductRepository();
     this.alertRepo = new PriceAlertRepository();
+    this.queueRepo = new NotificationQueueRepository();
     this.priceService = new PriceService();
   }
 
@@ -36,6 +40,21 @@ export class WatchlistService {
         currency: "PKR",
         isActive: true,
       });
+
+      const product = await this.productRepo.findById(productId);
+      if (product && priceResult.newPrice <= targetPrice) {
+        const payload: NotificationPayload = {
+          title: "Price Drop Alert! 🎉",
+          body: `${product.title} is now PKR ${priceResult.newPrice.toLocaleString()}. Your target was PKR ${targetPrice.toLocaleString()}.`,
+          url: `/product/${productId}`,
+          icon: product.image,
+        };
+
+        await Promise.all([
+          this.queueRepo.addToQueue(userId, productId, "email", payload),
+          this.queueRepo.addToQueue(userId, productId, "push", payload),
+        ]);
+      }
 
       return { productId, alertId };
     } catch (error) {
