@@ -3,7 +3,7 @@ import { getDb } from "@/lib/db";
 /**
  * Initialize database collections and indexes
  * Run this once during application setup
- */
+ */ 
 export async function initializeDatabase() {
   try {
     const db = getDb();

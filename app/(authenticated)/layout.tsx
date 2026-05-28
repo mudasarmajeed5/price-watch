@@ -9,13 +9,14 @@ import {
   PlusIcon,
   UserCircle,
   Heart,
+  TrendingDown,
 } from "lucide-react";
 
 const navItems = [
   { label: "Home", icon: Home, href: "/" },
   { label: "Watchlist", icon: Eye, href: "/watchlist" },
   { label: "", icon: PlusIcon, href: "/add-product" },
-  { label: "Search", icon: Search, href: "/search" },
+  { label: "Savings", icon: TrendingDown, href: "/savings" },
   { label: "Profile", icon: UserCircle, href: "/profile" },
 ];
 
@@ -29,13 +30,22 @@ function LogoHeader() {
           </div>
           <span className="text-lg font-semibold">Bachat</span>
         </div>
-        <Link
-          href="/favorites"
-          className="flex items-center justify-center h-9 w-9 rounded-lg border border-input bg-muted/70 hover:bg-muted transition-colors"
-          aria-label="Favorites"
-        >
-          <Heart size={16} />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/search"
+            className="flex items-center justify-center h-9 w-9 rounded-lg border border-input bg-muted/70 hover:bg-muted transition-colors"
+            aria-label="Search"
+          >
+            <Search size={16} />
+          </Link>
+          <Link
+            href="/favorites"
+            className="flex items-center justify-center h-9 w-9 rounded-lg border border-input bg-muted/70 hover:bg-muted transition-colors"
+            aria-label="Favorites"
+          >
+            <Heart size={16} />
+          </Link>
+        </div>
       </div>
     </header>
   );
