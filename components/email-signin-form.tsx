@@ -21,12 +21,12 @@ export function EmailSignInForm() {
       description: "We have sent you a magic link.",
     });
 
+    setLoading(false);
+
     const res = await signIn("nodemailer", {
       email,
       redirect: false,
     });
-
-    setLoading(false);
 
     if (res?.error) {
       toast.error("Failed to send login email. Please try again.");
