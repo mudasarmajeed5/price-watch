@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Price Watch",
-    short_name: "Price Watch",
+    name: "Bachat",
+    short_name: "Bachat",
     description: "Track and monitor product prices across your favorite brands",
     start_url: "/",
     display: "standalone",

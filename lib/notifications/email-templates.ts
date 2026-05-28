@@ -64,12 +64,12 @@ export class EmailTemplates {
             You're receiving this email because you set a price alert for this product.
           </p>
           <p style="margin: 0;">
-            <a href="https://price-watch.app/profile" style="color: #0f6b4a; text-decoration: none; font-weight: 500;">Manage Alerts</a> • 
-            <a href="https://price-watch.app/profile" style="color: #0f6b4a; text-decoration: none; font-weight: 500;">Preferences</a>
+            <a href="https://bachat.app/profile" style="color: #0f6b4a; text-decoration: none; font-weight: 500;">Manage Alerts</a> • 
+            <a href="https://bachat.app/profile" style="color: #0f6b4a; text-decoration: none; font-weight: 500;">Preferences</a>
           </p>
           <p style="margin: 12px 0 0 0; font-size: 11px; color: #9ca3af;">
             © 2026 Price Watch. All rights reserved. | 
-            <a href="https://price-watch.app" style="color: #0f6b4a; text-decoration: none;">privacy</a>
+            <a href="https://bachat.app" style="color: #0f6b4a; text-decoration: none;">privacy</a>
           </p>
         </div>
 

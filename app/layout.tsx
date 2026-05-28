@@ -10,10 +10,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Price Watch",
+  title: "Bachat",
   description:
-    "Track prices and save money with Price Watch - your personal price watch assistant. Get instant alerts when your favorite products hit your target price. Start saving today!",
-  applicationName: "Price Watch",
+    "Track prices and save money with Bachat - your personal price monitoring assistant. Get instant alerts when your favorite products hit your target price. Start saving today!",
+  applicationName: "Bachat",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
