@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { TrendingDown, Minus, Trash2, Loader2 } from "lucide-react";
+import WatchlistSkeleton from "@/components/skeletons/watchlist-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -69,11 +70,7 @@ export default function WatchlistPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
+    return <WatchlistSkeleton />;
   }
   return (
     <>

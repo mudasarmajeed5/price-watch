@@ -6,12 +6,15 @@ import { getCollection } from "@/lib/products";
 
 export default async function ViewAllPage() {
   const recentlyAdded = await getCollection();
+  const biggestDrops = [...recentlyAdded]
+    .sort((a, b) => (b.dropAmount || 0) - (a.dropAmount || 0))
+    .slice(0, 10);
   return (
     <>
       <main className="flex-1 overflow-y-auto pb-20">
         <section className="px-3 py-4">
           <div className="flex flex-col gap-3">
-            {recentlyAdded.map((item) => (
+            {biggestDrops.map((item) => (
               <Link
                 key={String(item._id)}
                 href={`/product/${String(item._id)}`}

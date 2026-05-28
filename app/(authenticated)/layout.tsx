@@ -58,57 +58,64 @@ export default function AuthenticatedLayout({
 }) {
   const pathname = usePathname();
   const isProfile = pathname?.startsWith("/profile");
+  const isOnboarding = pathname?.startsWith("/onboarding");
+  const hideHeader = isProfile || isOnboarding;
+  const hideBottomNav = isOnboarding;
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/40 max-w-sm mx-auto relative w-full">
-      {!isProfile && <LogoHeader />}
-      <div className="flex-1 pb-20 w-full">{children}</div>
-      <nav className="fixed bottom-0 bg-white left-1/2 -translate-x-1/2 w-full max-w-sm border-t flex items-center justify-around px-2 py-2 z-10">
-        {navItems.map(({ label, icon: Icon, href }) => {
-          const isActive =
-            pathname === href || (href !== "/" && pathname?.startsWith(href));
-          const isFab = label === "";
+      {!hideHeader && <LogoHeader />}
+      <div className={`flex-1 w-full ${hideBottomNav ? "" : "pb-20"}`}>
+        {children}
+      </div>
+      {!hideBottomNav && (
+        <nav className="fixed bottom-0 bg-white left-1/2 -translate-x-1/2 w-full max-w-sm border-t flex items-center justify-around px-2 py-2 z-10">
+          {navItems.map(({ label, icon: Icon, href }) => {
+            const isActive =
+              pathname === href || (href !== "/" && pathname?.startsWith(href));
+            const isFab = label === "";
 
-          if (isFab) {
+            if (isFab) {
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-label="Add"
+                  className={`relative -mt-4 flex items-center justify-center w-12 h-12 rounded-full transition-shadow focus:outline-none focus:ring-2 focus:ring-emerald-300 ${
+                    isActive
+                      ? "bg-emerald-800 text-white shadow-xl"
+                      : "bg-emerald-700 text-white shadow-lg"
+                  }`}
+                >
+                  <Icon size={24} strokeWidth={1.8} />
+                </Link>
+              );
+            }
+
             return (
               <Link
                 key={href}
                 href={href}
-                aria-label="Add"
-                className={`relative -mt-4 flex items-center justify-center w-12 h-12 rounded-full transition-shadow focus:outline-none focus:ring-2 focus:ring-emerald-300 ${
+                aria-label={label}
+                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
                   isActive
-                    ? "bg-emerald-800 text-white shadow-xl"
-                    : "bg-emerald-700 text-white shadow-lg"
+                    ? "bg-emerald-50 text-emerald-700"
+                    : "text-muted-foreground"
                 }`}
               >
-                <Icon size={24} strokeWidth={1.8} />
+                <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+                <span
+                  className={`text-[10px] ${
+                    isActive ? "font-semibold" : "font-normal"
+                  }`}
+                >
+                  {label}
+                </span>
               </Link>
             );
-          }
-
-          return (
-            <Link
-              key={href}
-              href={href}
-              aria-label={label}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors ${
-                isActive
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
-              <span
-                className={`text-[10px] ${
-                  isActive ? "font-semibold" : "font-normal"
-                }`}
-              >
-                {label}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
+          })}
+        </nav>
+      )}
     </div>
   );
 }

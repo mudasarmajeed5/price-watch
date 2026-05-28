@@ -3,16 +3,10 @@
 import { useMemo, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  Bell,
-  Search,
-  SlidersHorizontal,
-  TrendingDown,
-  Heart,
-} from "lucide-react";
+import { Search, SlidersHorizontal, TrendingDown, Heart } from "lucide-react";
+import SearchSkeleton from "@/components/skeletons/search-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Product } from "@/lib/products";
 import { useFavorites } from "@/lib/use-favorites";
 
@@ -70,6 +64,8 @@ export default function SearchPage() {
       }),
     [activeStore, normalizedQuery, results],
   );
+
+  if (isLoading) return <SearchSkeleton />;
 
   return (
     <>

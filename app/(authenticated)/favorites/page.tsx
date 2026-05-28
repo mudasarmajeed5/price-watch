@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
+import FavoritesSkeleton from "@/components/skeletons/favorites-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useFavorites } from "@/lib/use-favorites";
@@ -47,6 +48,8 @@ export default function FavoritesPage() {
 
     fetchFavorites();
   }, [favorites]);
+
+  if (isLoading) return <FavoritesSkeleton />;
 
   return (
     <>

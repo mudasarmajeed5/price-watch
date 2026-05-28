@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, TrendingDown, Minus, Heart } from "lucide-react";
+import {
+  TrendingDown,
+  Heart,
+  Search,
+  BellRing,
+  ShoppingBag,
+} from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,25 +15,41 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+
 import { format } from "date-fns";
 import { getCollection } from "@/lib/products";
 
 export default async function HomePage() {
   const watchlist = await getCollection();
+
+  const hasItems = watchlist.length > 0;
+  const biggestDrops = [...watchlist]
+    .map((item) => ({
+      ...item,
+      computedDrop: (item.targetPrice ?? 0) - (item.latestPrice ?? 0),
+    }))
+    .filter((item) => (item.computedDrop ?? 0) > 0)
+    .sort((a, b) => (b.computedDrop ?? 0) - (a.computedDrop ?? 0))
+    .slice(0, 3);
+
   return (
-    <>
-      <main className="flex-1 overflow-y-auto pb-20 w-full">
-        {/* Watchlist Carousel */}
-        <section className="pt-3">
-          <div className="flex items-center justify-between px-3 mb-2">
-            <h2 className="text-sm font-semibold">Your Watchlist</h2>
+    <main className="flex-1 overflow-y-auto pb-20 w-full">
+      {/* Watchlist Carousel */}
+      <section className="pt-3">
+        <div className="flex items-center justify-between px-3 mb-2">
+          <h2 className="text-sm font-semibold">Your Watchlist</h2>
+
+          {hasItems && (
             <Link
               href="/watchlist"
               className="text-xs text-emerald-700 font-medium"
             >
               View All
             </Link>
-          </div>
+          )}
+        </div>
+
+        {hasItems ? (
           <Carousel
             opts={{ align: "start", dragFree: true }}
             className="w-full pb-1"
@@ -50,21 +73,25 @@ export default async function HomePage() {
                             sizes="(max-width: 768px) 75vw, 300px"
                           />
                         </div>
+
                         <div className="flex flex-col gap-0.5">
                           <p className="text-sm font-semibold leading-snug line-clamp-1">
                             {item.title}
                           </p>
+
                           <p className="text-[11px] text-muted-foreground">
                             {item.brand}
                           </p>
+
                           <div className="mt-1.5 flex items-center justify-between">
                             <p className="text-base font-bold text-emerald-700">
                               Rs. {(item.latestPrice || 0).toLocaleString()}
                             </p>
+
                             {item.dropAmount && item.dropAmount > 0 ? (
                               <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-0 text-[10px] px-1.5 py-0.5 gap-1">
-                                <TrendingDown size={12} /> Rs.{" "}
-                                {item.dropAmount.toLocaleString()}
+                                <TrendingDown size={12} />
+                                Rs. {item.dropAmount.toLocaleString()}
                               </Badge>
                             ) : (
                               <Badge
@@ -83,29 +110,80 @@ export default async function HomePage() {
               ))}
             </CarouselContent>
           </Carousel>
-        </section>
+        ) : (
+          <div className="px-3">
+            <Card className="rounded-2xl border-dashed bg-linear-to-b from-emerald-50/80 to-background shadow-none">
+              <CardContent className="py-8 flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                  <Heart className="size-6 text-emerald-700" />
+                </div>
 
-        <hr className="mx-5 my-6 border-dashed" />
+                <h3 className="font-semibold text-base mb-1">
+                  Your watchlist is empty
+                </h3>
 
-        {/* Biggest Price Drops */}
-        <section>
-          <div className="flex items-center justify-between px-3 mb-4">
-            <h2 className="text-sm font-semibold">Biggest Price Drops</h2>
+                <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
+                  Track your favorite products and get notified when prices
+                  drop.
+                </p>
+
+                <div className="grid grid-cols-3 gap-2 mt-6 w-full">
+                  <div className="rounded-xl border bg-background p-3 flex flex-col items-center text-center">
+                    <Search className="size-4 mb-2 text-emerald-700" />
+                    <span className="text-[11px] font-medium">
+                      Search Products
+                    </span>
+                  </div>
+
+                  <div className="rounded-xl border bg-background p-3 flex flex-col items-center text-center">
+                    <BellRing className="size-4 mb-2 text-emerald-700" />
+                    <span className="text-[11px] font-medium">Set Alerts</span>
+                  </div>
+
+                  <div className="rounded-xl border bg-background p-3 flex flex-col items-center text-center">
+                    <TrendingDown className="size-4 mb-2 text-emerald-700" />
+                    <span className="text-[11px] font-medium">Save Money</span>
+                  </div>
+                </div>
+
+                <Link
+                  href="/search"
+                  className="mt-6 inline-flex items-center justify-center rounded-xl bg-emerald-700 text-white text-sm font-medium px-5 py-2.5 hover:bg-emerald-800 transition-colors"
+                >
+                  Explore Products
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </section>
+
+      <hr className="mx-5 my-6 border-dashed" />
+
+      {/* Biggest Price Drops */}
+      <section>
+        <div className="flex items-center justify-between px-3 mb-4">
+          <h2 className="text-sm font-semibold">Biggest Price Drops</h2>
+
+          {hasItems && (
             <Link
               href="/view-all"
               className="text-xs text-emerald-700 font-medium"
             >
               View All
             </Link>
-          </div>
+          )}
+        </div>
+
+        {biggestDrops.length > 0 ? (
           <div className="flex flex-col gap-2.5 px-3">
-            {watchlist.map((deal) => (
+            {biggestDrops.map((deal) => (
               <Link
                 key={String(deal._id)}
                 href={`/product/${String(deal._id)}`}
                 className="block"
               >
-                <Card className="rounded-xl shadow-sm ring-0 hover:shadow-md transition-shadow duration-200">
+                <Card className="rounded-xl border border-emerald-100/70 bg-white shadow-sm ring-0 hover:shadow-md transition-shadow duration-200">
                   <CardContent className="p-2.5 flex gap-3 items-stretch relative">
                     <div className="relative w-20 h-28 rounded-xl overflow-hidden bg-emerald-50/50 shrink-0">
                       <Image
@@ -116,10 +194,12 @@ export default async function HomePage() {
                         sizes="80px"
                       />
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold leading-snug line-clamp-2 mb-1">
                         {deal.title}
                       </p>
+
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                         <Badge
                           className={`text-[9px] px-1.5 py-0 border-0 ${
@@ -131,20 +211,18 @@ export default async function HomePage() {
                         >
                           {deal.store}
                         </Badge>
-                        {deal.dropAmount === 0 || !deal.dropAmount ? (
-                          <Badge className="bg-slate-50 text-slate-700 hover:bg-slate-50 border-0 text-[9px] px-1.5 py-0">
-                            Target: Rs {deal.targetPrice?.toLocaleString()}
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-emerald-50 text-emerald-800 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0 gap-1">
-                            ↓ Rs {deal.dropAmount?.toLocaleString()} off target!
-                          </Badge>
-                        )}
+
+                        <Badge className="bg-emerald-50 text-emerald-800 hover:bg-emerald-50 border-0 text-[9px] px-1.5 py-0.5 gap-1">
+                          ↓ Rs {(deal.computedDrop ?? 0).toLocaleString()} off
+                          target!
+                        </Badge>
                       </div>
+
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-sm font-bold text-emerald-700">
                           Rs. {(deal.latestPrice || 0).toLocaleString()}
                         </span>
+
                         {deal.originalPrice ? (
                           <span className="text-[10px] text-muted-foreground line-through">
                             Rs. {deal.originalPrice.toLocaleString()}
@@ -152,6 +230,7 @@ export default async function HomePage() {
                         ) : null}
                       </div>
                     </div>
+
                     <span className="absolute top-3 right-3 text-[9px] text-muted-foreground">
                       {format(
                         deal.addedAt ? new Date(deal.addedAt) : new Date(),
@@ -163,8 +242,27 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
-        </section>
-      </main>
-    </>
+        ) : (
+          <div className="px-3">
+            <Card className="rounded-2xl border-dashed bg-linear-to-b from-emerald-50/80 to-background shadow-none">
+              <CardContent className="py-8 flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+                  <TrendingDown className="size-6 text-emerald-700" />
+                </div>
+
+                <h3 className="font-semibold text-base mb-1">
+                  No major price drops yet
+                </h3>
+
+                <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
+                  We'll show the biggest savings here when products in your
+                  watchlist drop below target prices.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

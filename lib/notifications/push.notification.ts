@@ -16,7 +16,7 @@ export class PushNotification implements INotification {
 
     if (publicKey && privateKey) {
       // Ensure the VAPID subject is a valid mailto: or https: URL
-      const rawSubject = process.env.VAPID_EMAIL || "admin@bachat.app";
+      const rawSubject = process.env.VAPID_EMAIL || "admin@price-watch.app";
       const subject =
         rawSubject.startsWith("mailto:") || rawSubject.startsWith("https:")
           ? rawSubject

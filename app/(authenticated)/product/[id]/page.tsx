@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { Check, Heart, Loader2, Trash2 } from "lucide-react";
+import ProductSkeleton from "@/components/skeletons/product-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -68,11 +69,7 @@ export default function ProductPage() {
   const favorite = product ? isFavorite(String(product._id)) : false;
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center py-20">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
+    return <ProductSkeleton />;
   }
 
   if (!product) {

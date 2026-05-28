@@ -206,7 +206,7 @@ export default function Page() {
             automatically.
           </p>
 
-          <Card className="mb-4 rounded-2xl shadow-sm">
+          <Card className="mb-4 rounded-2xl border border-emerald-100/70 bg-white shadow-sm">
             <CardContent className="pt-5 pb-4">
               <div className="flex flex-col gap-4">
                 <div className="space-y-2">
@@ -296,7 +296,7 @@ export default function Page() {
             </CardContent>
           </Card>
 
-          <Card className="mb-4 rounded-2xl shadow-sm">
+          <Card className="mb-4 rounded-2xl border border-emerald-100/70 bg-white shadow-sm">
             <CardContent className="pt-5 pb-4">
               {preview ? (
                 <div className="flex flex-col gap-3">
@@ -352,7 +352,10 @@ export default function Page() {
               </h2>
               <div className="flex flex-col gap-3">
                 {products.map((p) => (
-                  <Card key={p.id}>
+                  <Card
+                    key={p.id}
+                    className="border border-emerald-100/70 bg-white"
+                  >
                     <CardContent className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">

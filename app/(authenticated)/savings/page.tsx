@@ -8,6 +8,15 @@ import { ObjectId } from "mongodb";
 
 export const revalidate = 60; // Cache for 60 seconds
 
+const formatPkrCompact = (value: number) =>
+  new Intl.NumberFormat("en-PK", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
+
+const formatPkrExact = (value: number) =>
+  new Intl.NumberFormat("en-PK").format(value);
+
 export default async function SavingsPage() {
   const session = await auth();
 
@@ -21,6 +30,16 @@ export default async function SavingsPage() {
     const userId = new ObjectId(session.user.id!);
 
     const watchlist = await watchlistService.getUserWatchlist(userId);
+
+    // Total savings is the sum of (target - current) only for products already below target.
+    const totalSavings = watchlist.reduce((sum, item) => {
+      const targetPrice = item.targetPrice ?? 0;
+      const latestPrice = item.latestPrice ?? 0;
+      if (!targetPrice || latestPrice >= targetPrice) {
+        return sum;
+      }
+      return sum + (targetPrice - latestPrice);
+    }, 0);
 
     if (!watchlist || watchlist.length === 0) {
       return (
@@ -72,36 +91,40 @@ export default async function SavingsPage() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 mb-6">
-            <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
-              <p className="text-2xl font-medium text-blue-600">
-                {watchlist.length}
+          <div className="mb-6 space-y-2.5">
+            <div className="bg-white rounded-2xl border border-violet-100 p-4">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-violet-500">
+                Total Saved
               </p>
-              <p className="text-[11px] text-gray-400 mt-1 leading-tight">
-                Products
-                <br />
-                watched
+              <p className="mt-1 text-[28px] leading-tight font-semibold text-violet-700 break-words">
+                PKR {formatPkrCompact(totalSavings)}
               </p>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
-              <p className="text-2xl font-medium text-green-700">
-                {productsWithAlerts}
-              </p>
-              <p className="text-[11px] text-gray-400 mt-1 leading-tight">
-                Active
-                <br />
-                alerts
+              <p className="mt-1 text-[11px] text-gray-400">
+                Exact: PKR {formatPkrExact(totalSavings)}
               </p>
             </div>
-            <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
-              <p className="text-2xl font-medium text-violet-600">
-                {watchlist.length}
-              </p>
-              <p className="text-[11px] text-gray-400 mt-1 leading-tight">
-                Savings
-                <br />
-                tracked
-              </p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
+                <p className="text-2xl font-medium text-blue-600">
+                  {watchlist.length}
+                </p>
+                <p className="text-[11px] text-gray-400 mt-1 leading-tight">
+                  Products
+                  <br />
+                  watched
+                </p>
+              </div>
+              <div className="bg-white rounded-xl border border-gray-100 p-3 text-center">
+                <p className="text-2xl font-medium text-green-700">
+                  {productsWithAlerts}
+                </p>
+                <p className="text-[11px] text-gray-400 mt-1 leading-tight">
+                  Active
+                  <br />
+                  alerts
+                </p>
+              </div>
             </div>
           </div>
 
@@ -124,7 +147,7 @@ export default async function SavingsPage() {
                 >
                   {/* Top: image + title + badges */}
                   <div className="flex gap-3 p-3.5 pb-3">
-                    <div className="w-16 h-16 rounded-xl border border-gray-100 bg-gray-50 flex-shrink-0 overflow-hidden">
+                    <div className="w-16 h-16 rounded-xl border border-gray-100 bg-gray-50 shrink-0 overflow-hidden">
                       {item.image ? (
                         <img
                           src={item.image}
