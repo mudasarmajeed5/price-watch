@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
@@ -26,8 +27,13 @@ export default function OnboardingPage() {
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const slide = slides[activeIndex];
   const startX = useRef<number | null>(null);
+  const router = useRouter();
 
   const goToSlide = (index: number) => {
+    if (index >= slides.length) {
+      router.push("/add-product");
+      return;
+    }
     const nextIndex = Math.max(0, Math.min(index, slides.length - 1));
     setDirection(nextIndex > activeIndex ? "next" : "prev");
     setActiveIndex(nextIndex);
@@ -75,7 +81,10 @@ export default function OnboardingPage() {
       <div className="mx-auto flex h-full w-full max-w-sm flex-col">
         <section className="flex flex-1 flex-col select-none">
           {/* Skip */}
-          <div className="flex items-center justify-end pb-10 text-sm font-medium text-[#7a8a83] cursor-pointer pr-1">
+          <div
+            className="flex items-center justify-end pb-10 text-sm font-medium text-[#7a8a83] cursor-pointer pr-1"
+            onClick={() => router.push("/add-product")}
+          >
             Skip
           </div>
 
