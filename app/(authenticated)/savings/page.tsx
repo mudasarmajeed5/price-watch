@@ -93,10 +93,10 @@ export default async function SavingsPage() {
           {/* Stats */}
           <div className="mb-6 space-y-2.5">
             <div className="bg-white rounded-2xl border border-violet-100 p-4">
-              <p className="text-[11px] font-medium uppercase tracking-wider text-violet-500">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-blue-500">
                 Total Saved
               </p>
-              <p className="mt-1 text-[28px] leading-tight font-semibold text-violet-700 break-words">
+              <p className="mt-1 text-[28px] leading-tight font-semibold text-blue-700 break-words">
                 PKR {formatPkrCompact(totalSavings)}
               </p>
               <p className="mt-1 text-[11px] text-gray-400">

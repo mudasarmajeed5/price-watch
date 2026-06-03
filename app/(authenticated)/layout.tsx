@@ -45,6 +45,18 @@ function LogoHeader() {
           >
             <Heart size={16} />
           </Link>
+          <Link
+            href="/onboarding/tutorial"
+            className="flex items-center justify-center h-9 w-9 rounded-lg bg-muted/70 hover:bg-muted transition-colors"
+            aria-label="Watch Tutorial"
+          >
+            <Image
+              src="/images/help.svg"
+              alt="Watch tutorial"
+              width={36}
+              height={36}
+            />
+          </Link>
         </div>
       </div>
     </header>
@@ -59,8 +71,9 @@ export default function AuthenticatedLayout({
   const pathname = usePathname();
   const isProfile = pathname?.startsWith("/profile");
   const isOnboarding = pathname?.startsWith("/onboarding");
-  const hideHeader = isProfile || isOnboarding;
-  const hideBottomNav = isOnboarding;
+  const isTutorialScreen = pathname === "/onboarding/tutorial";
+  const hideHeader = isProfile || (isOnboarding && !isTutorialScreen);
+  const hideBottomNav = isOnboarding && !isTutorialScreen;
 
   return (
     <div className="flex flex-col min-h-screen bg-muted/40 max-w-sm mx-auto relative w-full">

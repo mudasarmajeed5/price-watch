@@ -31,7 +31,7 @@ export default async function HomePage() {
       {/* Watchlist Carousel */}
       <section className="pt-3">
         <div className="flex items-center justify-between px-3 mb-2">
-          <h2 className="text-lg font-semibold">Your Watchlist</h2>
+          <h2 className="text-lg font-semibold">Recently Added</h2>
           {hasItems && (
             <Link href="/watchlist" className="text-xs text-emerald-700 font-medium">
               View All

@@ -11,7 +11,7 @@ class DatabaseConnection {
       throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
     }
   }
-
+  
   public static getInstance(): DatabaseConnection {
     if (!DatabaseConnection.instance) {
       DatabaseConnection.instance = new DatabaseConnection();

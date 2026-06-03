@@ -32,12 +32,6 @@ const SETTINGS: Setting[] = [
     description: "Get updates and summaries by email.",
     icon: <Mail size={15} />,
   },
-  {
-    id: "inapp",
-    label: "In-App Alerts",
-    description: "Show banners inside the application.",
-    icon: <BellRing size={15} />,
-  },
 ];
 
 export function NotificationSettingsDialog() {
